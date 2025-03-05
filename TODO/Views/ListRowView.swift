@@ -11,22 +11,48 @@ import SwiftUI
 struct ListRowView: View {
     
     let item: ItemModel
+    let checkmarkClicked: () -> Void
     
     var body: some View {
         HStack {
             Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
                 .foregroundStyle(Color.accentColor)
+                .onTapGesture {
+                    checkmarkClicked()
+                }
             Text(item.title)
+            
             Spacer()
+            
+            if let startingTime = item.startingTime {
+                RoundedRectangle(cornerRadius: 6)
+                    .foregroundStyle(Color.accentColor)
+                    .frame(width: 60, height: 35)
+                    .overlay {
+                        HStack {
+                            Text(startingTime.formattedTime)
+                                .font(.caption)
+                                .foregroundStyle(.white)
+                        }
+                    }
+            }
+            Image(systemName: "chevron.forward")
+                .padding(.trailing)
+            
         }
         .font(.title2)
-        .padding(.vertical, 8)
+        .padding(.vertical, item.startingTime == nil ? 6 : 2)
     }
 }
 
 #Preview {
-    
-    let item1 = ItemModel(title: "Item1", isCompleted: false)
-    
-    ListRowView(item: item1)
+    let item1 = ItemModel(title: "Item4", description: "desc4", startingTime: Date(),isCompleted: false, remindMe: false, priority: Strings.Blue)
+   
+    ZStack {
+        Color.blue
+        ListRowView(item: item1, checkmarkClicked: {
+            
+        })
+    }
+   
 }

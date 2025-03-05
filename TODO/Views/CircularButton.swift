@@ -8,11 +8,30 @@
 import SwiftUI
 
 struct CircularButton: View {
+    
+    let icon: String
+    let action: () -> Void
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Button {
+            action()
+        } label: {
+            Circle()
+                .fill(
+                    LinearGradient(gradient: Gradient(colors: Colors.whiteToAccent), startPoint: .bottomTrailing, endPoint: .topLeading)
+                )
+                .frame(width: 60, height: 60)
+                .overlay {
+                    Image(systemName: icon)
+                        .foregroundStyle(.white)
+                }
+        }
+
     }
 }
 
 #Preview {
-    CircularButton()
+    CircularButton(icon: "play.fill") {
+        
+    }
 }

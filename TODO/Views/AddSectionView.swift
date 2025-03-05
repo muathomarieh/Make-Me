@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-struct AddView: View {
+struct AddSectionView: View {
     
+    let inBoard: BoardModel
     @Environment(\.dismiss) var dismiss
     @Environment(ListViewModel.self) var listViewModel: ListViewModel
     @State var textFieldText: String = ""
@@ -18,29 +19,15 @@ struct AddView: View {
     var body: some View {
         ScrollView {
             VStack {
-                TextField("Type something here...", text: $textFieldText)
-                    .frame(height: 55)
-                    .padding(.horizontal)
-                    .background(Color(UIColor.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                
-                Button {
+                TextFieldView(placeHolder: "Section Title..." ,textFieldText: $textFieldText)
+                AppButton(buttonTitle: "Save".uppercased()) {
                     saveButtonPressed()
-                } label: {
-                    Text("Save".uppercased())
-                        .foregroundStyle(.white)
-                        .font(.headline)
-                        .frame(height: 55)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.accentColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
-
             }
             .padding()
             
         }
-        .navigationTitle("Add an Item 🖋️")
+        .navigationTitle("Add New Section 📨")
         .alert(alertTitle, isPresented: $showAlert) {
             Button("Ok", role: .cancel) {
                 alertTitle = ""
@@ -50,15 +37,14 @@ struct AddView: View {
     
     func saveButtonPressed() {
         if textIsAppropriate() {
-            listViewModel.addItem(title: textFieldText)
+            listViewModel.addSection(title: textFieldText, for: inBoard)
             dismiss()
         }
-        
     }
     
     func textIsAppropriate() -> Bool {
-        if textFieldText.count < 3 {
-            alertTitle = "Your new todo item must be at least 3 characters long 😃"
+        if textFieldText.count < 3 || textFieldText.count > 8{
+            alertTitle = "Your new todo item must be 3-8 characters long 😃"
             showAlert.toggle()
             return false
         }
@@ -70,7 +56,8 @@ struct AddView: View {
 
 #Preview {
     NavigationView {
-        AddView()
+        AddSectionView(inBoard: BoardModel(boardName: "BoardTestname", boardImage: "testImage"))
     }
     .environment(ListViewModel())
 }
+

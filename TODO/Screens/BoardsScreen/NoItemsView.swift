@@ -9,8 +9,9 @@ import SwiftUI
 
 struct NoItemsView: View {
     
+    let inBoard: BoardModel
     @State var animate: Bool = false
-    let secondaryAccentColor = Color("SecondaryAccentColor")
+    let maroonColor = Color("MaroonColor")
     
     var body: some View {
       
@@ -26,7 +27,7 @@ struct NoItemsView: View {
             )
             .padding(.bottom, 20)
             NavigationLink {
-                AddSectionView()
+                AddSectionView(inBoard: inBoard)
             } label: {
                 Text("Add Something 🥳")
                     .foregroundStyle(.white)
@@ -34,13 +35,13 @@ struct NoItemsView: View {
                     .frame(height: 55)
                     .frame(maxWidth: .infinity)
                     .background(
-                        animate ? secondaryAccentColor : Color.accentColor
+                        animate ? maroonColor : Color.accentColor
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .padding(.horizontal, animate ? 30 : 50)
             .shadow(
-                color: animate ? secondaryAccentColor
+                color: animate ? maroonColor
                     .opacity(0.7) : Color.accentColor
                     .opacity(0.7),
                 radius: animate ? 30 : 10,
@@ -75,7 +76,9 @@ struct NoItemsView: View {
 
 #Preview {
     NavigationView {
-        NoItemsView()
+        NoItemsView(inBoard: BoardModel(boardName: "BoardTestname", boardImage: "testImage"))
             .navigationTitle("Title")
     }
 }
+
+

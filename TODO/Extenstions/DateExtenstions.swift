@@ -14,3 +14,11 @@ extension Date {
         return formatter.string(from: self)
     }
 }
+
+extension String {
+    var stringToDate: Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "hh:mma"
+        return formatter.date(from: self) ?? Date()
+    }
+}
