@@ -7,7 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EB31F7862D92D6BE00DEF773 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = EB31F7852D92D6BE00DEF773 /* GoogleSignIn */; };
+		EB31F7882D92D6BE00DEF773 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = EB31F7872D92D6BE00DEF773 /* GoogleSignInSwift */; };
 		EBDD408E2D6A714500B7A4FF /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = EBDD408D2D6A714500B7A4FF /* ConfettiSwiftUI */; };
+		EBDD4EA72D91337C00B7A4FF /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = EBDD4EA62D91337C00B7A4FF /* FirebaseAnalytics */; };
+		EBDD4EA92D91337C00B7A4FF /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = EBDD4EA82D91337C00B7A4FF /* FirebaseAuth */; };
+		EBDD4EAB2D91337C00B7A4FF /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = EBDD4EAA2D91337C00B7A4FF /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,9 +38,22 @@
 		EBAD871B2D679C250055704C /* TODOUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TODOUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		EB31F78A2D92D98C00DEF773 /* Exceptions for "TODO" folder in "TODO" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = EBAD87002D679C210055704C /* TODO */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		EBAD87032D679C210055704C /* TODO */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EB31F78A2D92D98C00DEF773 /* Exceptions for "TODO" folder in "TODO" target */,
+			);
 			path = TODO;
 			sourceTree = "<group>";
 		};
@@ -56,6 +74,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB31F7862D92D6BE00DEF773 /* GoogleSignIn in Frameworks */,
+				EBDD4EA72D91337C00B7A4FF /* FirebaseAnalytics in Frameworks */,
+				EBDD4EAB2D91337C00B7A4FF /* FirebaseFirestore in Frameworks */,
+				EB31F7882D92D6BE00DEF773 /* GoogleSignInSwift in Frameworks */,
+				EBDD4EA92D91337C00B7A4FF /* FirebaseAuth in Frameworks */,
 				EBDD408E2D6A714500B7A4FF /* ConfettiSwiftUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -118,6 +141,11 @@
 			name = TODO;
 			packageProductDependencies = (
 				EBDD408D2D6A714500B7A4FF /* ConfettiSwiftUI */,
+				EBDD4EA62D91337C00B7A4FF /* FirebaseAnalytics */,
+				EBDD4EA82D91337C00B7A4FF /* FirebaseAuth */,
+				EBDD4EAA2D91337C00B7A4FF /* FirebaseFirestore */,
+				EB31F7852D92D6BE00DEF773 /* GoogleSignIn */,
+				EB31F7872D92D6BE00DEF773 /* GoogleSignInSwift */,
 			);
 			productName = TODO;
 			productReference = EBAD87012D679C210055704C /* TODO.app */;
@@ -203,6 +231,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				EBDD408C2D6A704200B7A4FF /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
+				EBDD4EA52D91337C00B7A4FF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				EB31F7842D92D6BE00DEF773 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EBAD87022D679C210055704C /* Products */;
@@ -405,9 +435,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TODO/Preview Content\"";
-				DEVELOPMENT_TEAM = 6LQRCW927F;
+				DEVELOPMENT_TEAM = Q68YACLX35;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TODO/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -434,9 +465,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TODO/Preview Content\"";
-				DEVELOPMENT_TEAM = 6LQRCW927F;
+				DEVELOPMENT_TEAM = Q68YACLX35;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TODO/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -565,6 +597,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		EB31F7842D92D6BE00DEF773 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 		EBDD408C2D6A704200B7A4FF /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI.git";
@@ -573,12 +613,45 @@
 				minimumVersion = 2.0.2;
 			};
 		};
+		EBDD4EA52D91337C00B7A4FF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.10.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		EB31F7852D92D6BE00DEF773 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EB31F7842D92D6BE00DEF773 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		EB31F7872D92D6BE00DEF773 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EB31F7842D92D6BE00DEF773 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
 		EBDD408D2D6A714500B7A4FF /* ConfettiSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ConfettiSwiftUI;
+		};
+		EBDD4EA62D91337C00B7A4FF /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EBDD4EA52D91337C00B7A4FF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		EBDD4EA82D91337C00B7A4FF /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EBDD4EA52D91337C00B7A4FF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		EBDD4EAA2D91337C00B7A4FF /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EBDD4EA52D91337C00B7A4FF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -18,4 +18,9 @@ struct Strings {
     static let Blue  = "Blue"
     static let Purple  = "Purple"
     static let Gray  = "Gray"
+    
+    static let ADD = "Add"
+    static let SAVE = "Save"
+    
+    
 }

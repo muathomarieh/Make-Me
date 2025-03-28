@@ -7,19 +7,26 @@
 
 import Foundation
 
-struct User: Identifiable, Codable {
+struct UserModel: Identifiable, Codable {
     let id: String
     let name: String
     let boards: [String]
     let friends: [String]
+    
+    init(id: String, name: String, boards: [String] = [], friends: [String] = []) {
+        self.id = id
+        self.name = name
+        self.boards = boards
+        self.friends = friends
+    }
 }
 
-struct Board: Identifiable, Codable {
+struct BoardChanged: Identifiable, Codable {
     var id: String?
     let boardName: String
     let boardImage: String
     var isFavorite: Bool
-    var boardSections: [SectionModel]
+    var boardSections: [Section]
     let boardOwner: String
     let boardUsers: [String]
 
@@ -27,7 +34,7 @@ struct Board: Identifiable, Codable {
          boardName: String,
          boardImage: String,
          isFavorite: Bool = false,
-         boardSections: [SectionModel] = [],
+         boardSections: [Section] = [],
          boardOwner: String,
          boardUsers: [String]) {
         self.id = id
@@ -39,8 +46,8 @@ struct Board: Identifiable, Codable {
         self.boardUsers = boardUsers
     }
 
-    func toggleFavorite() -> Board {
-        Board(
+    func toggleFavorite() -> BoardChanged {
+        BoardChanged(
             id: id,
             boardName: boardName,
             boardImage: boardImage,
@@ -52,11 +59,59 @@ struct Board: Identifiable, Codable {
     }
 }
 
+struct NewUserModel: Identifiable, Codable {
+    let id: String
+    let name: String
+    let friends: [String]
+    
+    init(id: String, name: String, boards: [String] = [], friends: [String] = []) {
+        self.id = id
+        self.name = name
+        self.friends = friends
+    }
+}
+
+//struct BoardChanged: Identifiable, Codable {
+//    var id: String?
+//    let boardName: String
+//    let boardImage: String
+//    var isFavorite: Bool
+//    var boardSections: [Section]
+//    let boardOwner: String
+//    let boardUsers: [String]
+//
+//    init(id: String? = nil,
+//         boardName: String,
+//         boardImage: String,
+//         isFavorite: Bool = false,
+//         boardSections: [Section] = [],
+//         boardOwner: String,
+//         boardUsers: [String]) {
+//        self.id = id
+//        self.boardName = boardName
+//        self.boardImage = boardImage
+//        self.isFavorite = isFavorite
+//        self.boardSections = boardSections
+//        self.boardOwner = boardOwner
+//        self.boardUsers = boardUsers
+//    }
+//
+//    func toggleFavorite() -> BoardChanged {
+//        BoardChanged(
+//            id: id,
+//            boardName: boardName,
+//            boardImage: boardImage,
+//            isFavorite: !isFavorite,
+//            boardSections: boardSections,
+//            boardOwner: boardOwner,
+//            boardUsers: boardUsers
+//        )
+//    }
+//}
 
 //
 /*
  firebase base function
  data service firebase service
- class to retrieve user and friends data connected with the viewModel archeticture
- 
- */
+ class to retrieve user, boards and friends data connected with the viewModel
+  */

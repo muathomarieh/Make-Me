@@ -26,7 +26,7 @@ struct CustomProgressBar: ProgressViewStyle {
                     .foregroundStyle(Color.clear)
                     .background(
                         LinearGradient(
-                            gradient: Gradient(colors: Colors.whiteToAccent),
+                            gradient: Gradient(colors: Color.theme.whiteToAccent),
                             startPoint: .bottomTrailing,
                             endPoint: .topLeading
                         )

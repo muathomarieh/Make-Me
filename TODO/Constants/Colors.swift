@@ -9,8 +9,6 @@ import Foundation
 import SwiftUI
 
 struct Colors {
-    static let accentToWhite = [Color.accentColor, .white]
-    static let whiteToAccent = [.white, Color.accentColor]
     static let Red = Color(Strings.Red)
     static let Orange  = Color(Strings.Orange)
     static let Yellow  = Color(Strings.Yellow)

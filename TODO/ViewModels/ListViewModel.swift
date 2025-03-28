@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 /*
  CRUD FUNCTIONS
@@ -178,225 +179,329 @@ import SwiftUI
 ///
 ///////////////////////////////////////////////////////////
 
-@Observable class ListViewModel {
+//@Observable class ListViewModel {
+//
+//    var boards: [Board] = []{
+//        didSet {
+//            saveSections()
+//            if let url = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first {
+//            }
+//        }
+//    }
+//    
+//    let itemsKey: String = "boards_list"
+//    
+//    init() {
+//        getSections()
+//    }
+//        
+//    func getSections() {
+//        guard
+//            let data = UserDefaults.standard.data(forKey: itemsKey),
+//            let savedItems = try? JSONDecoder().decode(
+//                [Board].self,
+//                from: data
+//            ) // [ItemModel].self we need the type not actual array
+//        else { return }
+//        boards = savedItems
+//    }
+//    
+//    // MARK: ADDING PART
+//    func addBoard(boardName: String, boardImage: String) {
+//        let newBoard = Board(boardName: boardName, boardImage: boardImage)
+//        boards.append(newBoard)
+//    }
+//    
+//    func addSection(title: String, for board: Board) {
+//        if let boardIndex = getBoardIndex(for: board) {
+//            let newSection = Section(sectionTitle: title)
+//            boards[boardIndex].boardSections.append(newSection)
+//        }
+//    }
+//    
+//    func addItem(
+//        task: Task,
+//        forSection section: Section,
+//        forBoard board: Board
+//    ) {
+//        if let boardIndex = getBoardIndex(for: board),
+//           let sectionIndex = getSectionIndex(for: section, in: boardIndex) {
+//            
+//            let id = UUID().uuidString
+//            
+//            if let date = task.startingTime {
+//                if task.remindMe {
+//                    NotificationManager.instance
+//                        .scheduleNotification(taskTitle: task.title, date: date, id: task.id)
+//                }
+//            }
+//            print(id)
+//            boards[boardIndex].boardSections[sectionIndex].sectionItems.append(task)
+//            
+//        }
+//    }
+//    
+//    
+//    
+//    // MARK: DELETE ITEM
+//    func deleteItem(
+//        for board: Board,
+//        from section: Section,
+//        at indexSet: IndexSet
+//    ) {
+//        if let boardIndex = getBoardIndex(for: board),
+//           let sectionIndex = getSectionIndex(for: section, in: boardIndex) {
+//            
+//            // Get removed items before deleting
+//            let removedItems = indexSet.map { boards[boardIndex].boardSections[sectionIndex].sectionItems[$0] }
+//            if let id = removedItems.first?.id {
+//                print("Deleted task id: \(id)")
+//                NotificationManager.instance.cancelNotification(to: id)
+//            }
+//            // Remove items
+//            boards[boardIndex].boardSections[sectionIndex].sectionItems.remove(atOffsets: indexSet)
+//            
+//            // Remove the section if it's empty
+//            if boards[boardIndex].boardSections[sectionIndex].sectionItems.isEmpty {
+//                boards[boardIndex].boardSections.remove(at: sectionIndex)
+//            }
+//        }
+//    }
+//    
+//    // MARK: MOVE ITEM
+//    func moveItem(from: IndexSet, to: Int, for section: Section, for board: Board) {
+//        
+//        if let boardIndex = getBoardIndex(for: board),
+//           let sectionIndex = getSectionIndex(for: section, in: boardIndex) {
+//            
+//            boards[boardIndex].boardSections[sectionIndex].sectionItems.move(fromOffsets: from, toOffset: to)
+//        }
+//    }
+//    
+//    // MARK: UPDATE ITEM
+//    func updateItemCheckmark(task: Task, forSection section: Section, forBoard board: Board) {
+//            
+//        if let boardIndex = getBoardIndex(for: board),
+//           let sectionIndex = getSectionIndex(for: section, in: boardIndex) {
+//            
+//            if let itemIndex = boards[boardIndex].boardSections[sectionIndex].sectionItems.firstIndex(
+//                where: { $0.id == task.id
+//                }) {
+//                boards[boardIndex].boardSections[sectionIndex].sectionItems[itemIndex] = task.updateCompletion()
+//            }
+//        }
+//    }
+//    
+//    func updateItemContent(newTitle: String, newDescription: String, newStartingTime: Date?,
+//                           remindMe: Bool, priority: String?, item: Task, forSection section: Section, forBoard board: Board) {
+//            
+//        if let boardIndex = getBoardIndex(for: board),
+//           let sectionIndex = getSectionIndex(for: section, in: boardIndex) {
+//            
+//            if let date = newStartingTime {
+//                if remindMe {
+//                    NotificationManager.instance.cancelNotification(to: item.id)
+//                    NotificationManager.instance
+//                        .scheduleNotification(
+//                            taskTitle: newTitle,
+//                            date: date,
+//                            id: item.id
+//                        )
+//                } else {
+//                    NotificationManager.instance.cancelNotification(to: item.id)
+//                }
+//            }
+//            
+//            if let itemIndex = boards[boardIndex].boardSections[sectionIndex].sectionItems.firstIndex(
+//                where: { $0.id == item.id
+//                }) {
+//                boards[boardIndex].boardSections[sectionIndex].sectionItems[itemIndex] = item
+//                    .updateItemContent(newTitle: newTitle, newDescription: newDescription,
+//                                       newStartingTime: newStartingTime, newRemindMeState: remindMe, newPriority: priority)
+//            }
+//        }
+//    }
+//    
+//    // MARK: UPDATE BOARD
+//    func updateBoardFavoriteState(forBoard board: Board) {
+//            
+//        if let boardIndex = getBoardIndex(for: board) {
+//            boards[boardIndex] = board.updateCompletion()
+//        }
+//
+//    }
+//    
+//    // MARK: SAVE
+//    func saveSections() {
+//        if let encodedData = try? JSONEncoder().encode(boards) {
+//            UserDefaults.standard.set(encodedData, forKey: itemsKey)
+//        }
+//    }
+//    
+//    // MARK:
+//    func completedFractions(for section: Section) -> CGFloat {
+//        let numberOfChecked = section.sectionItems.count(
+//            where: { $0.isCompleted == true
+//            })
+//        return (CGFloat(numberOfChecked) / CGFloat(section.sectionItems.count))
+//    }
+//    
+//    
+//    func isSectionsEmptyInTheBoard(for board: Board) -> Bool {
+//        if let boardIndex = getBoardIndex(for: board) {
+//            return boards[boardIndex].boardSections.isEmpty
+//        }
+//        return true
+//    }
+//    
+//    func sectionForSelectedTask(_ task: Task, board: Board) -> Section? {
+//        guard let boardIndex = getBoardIndex(for: board) else {
+//            return nil
+//        }
+//        return boards[boardIndex].boardSections.first { $0.sectionItems.contains(task) }
+//    }
+//    
+//    /// Function  to get board index using board as param
+//    func getBoardIndex(for board: Board) -> Int? {
+//        if let boardIndex = boards.firstIndex(where: { $0.id == board.id }) {
+//            return boardIndex
+//        } else {
+//            return nil
+//        }
+//    }
+//    
+//    /// Function  to get section index using section and boardIndex as param
+//    private func getSectionIndex(for section: Section, in boardIndex: Int) -> Int? {
+//        if let sectionIndex = boards[boardIndex].boardSections.firstIndex(where: { $0.id == section.id }) {
+//            return sectionIndex
+//        } else {
+//            return nil
+//        }
+//    }
+//}
 
-    var boards: [BoardModel] = []{
-        didSet {
-            saveSections()
-            if let url = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first {
-                print(
-                    "UserDefaults are stored at: \(url.appendingPathComponent("Preferences/com.yourapp.bundle-id.plist"))"
-                )
-            }
-        }
-    }
-    let itemsKey: String = "boards_list"
+
+class ListViewModel: ObservableObject {
+    
+    @Published var boards: [Board] = []
+    @Published var user: UserModel? = nil
+    @Published var manager = BoardsManager.shared
+    @Published var text = ""
+    @Published var cancellable = Set<AnyCancellable>()
     
     init() {
-        getSections()
+        getBoards()
+       
+    }
+    
+    // FireStore
+    func userData() throws {
+        
+        let user = try AuthenticationManager.shared.getAuthenticatedUser()
+        FirebaseFirestore.shared.getUserData(userID: user.uid)
+            .receive(on: DispatchQueue.main)
+            .sink { error in
+                
+            } receiveValue: { [weak self] user in
+                self?.user = user
+            }
+            .store(in: &cancellable)
+
     }
     
     
-    func getSections() {
-        guard
-            let data = UserDefaults.standard.data(forKey: itemsKey),
-            let savedItems = try? JSONDecoder().decode(
-                [BoardModel].self,
-                from: data
-            ) // [ItemModel].self we need the type not actual array
-        else { return }
-        boards = savedItems
+    func getBoards() {
+        
+        $text
+            .combineLatest(manager.$boards)
+            .receive(on: DispatchQueue.main)
+            .map(filterBoards)
+            .sink { [weak self] boards in
+                self?.boards = boards
+            }
+            .store(in: &cancellable)
+    }
+    
+    private func filterBoards(text: String, boards: [Board]) -> [Board] {
+        guard !text.isEmpty else {
+            return boards
+        }
+        
+        let lowercassedText = text.lowercased()
+        return boards.filter { board -> Bool in
+            return board.boardName.lowercased().contains(lowercassedText)
+        }
     }
     
     // MARK: ADDING PART
-    func addBoard(boardName: String, boardImage: String) {
-        let newBoard = BoardModel(boardName: boardName, boardImage: boardImage)
-        boards.append(newBoard)
+    func addBoard(boardName: String, boardImage: String) throws {
+        let user = try AuthenticationManager.shared.getAuthenticatedUser()
+        try manager.addBoard(boardName: boardName, boardImage: boardImage, userID: user.uid)
     }
     
-    func addSection(title: String, for board: BoardModel) {
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return
-        }
-        let newSection = SectionModel(sectionTitle: title)
-        boards[boardIndex].boardSections.append(newSection)
+    func addSection(title: String, for board: Board) throws {
+        try manager.addSection(title: title, for: board)
     }
     
     func addItem(
-        id: String = UUID().uuidString,
-        title: String,
-        description: String,
-        startingTime: Date?,
-        remindMe: Bool,
-        priority: String?,
-        forSection section: SectionModel,
-        forBoard board: BoardModel
-    ) {
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return
-        }
-        guard let sectionIndex = boards[boardIndex].boardSections.firstIndex(where: { $0.id == section.id }) else {
-            return
-        }
-        
-        if let date = startingTime {
-            if remindMe {
-                NotificationManager.instance
-                    .scheduleNotification(taskTitle: title, date: date, id: id)
-            }
-        }
-        print(id)
-        let newItem = ItemModel(
-            id: id,
-            title: title,
-            description: description,
-            startingTime: startingTime,
-            isCompleted: false,
-            remindMe: remindMe,
-            priority: priority
-        )
-        boards[boardIndex].boardSections[sectionIndex].sectionItems.append(newItem)
+        task: TaskModel,
+        forSection section: Section,
+        forBoard board: Board
+    ) throws {
+        try manager.addItem(task: task, forSection: section, forBoard: board)
     }
+    
+    
     
     // MARK: DELETE ITEM
     func deleteItem(
-        for board: BoardModel,
-        from section: SectionModel,
+        for board: Board,
+        from section: Section,
         at indexSet: IndexSet
     ) {
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return
-        }
-        guard let sectionIndex = boards[boardIndex].boardSections.firstIndex(where: { $0.id == section.id }) else {
-            return
-        }
-        
-        // Get removed items before deleting
-        let removedItems = indexSet.map { boards[boardIndex].boardSections[sectionIndex].sectionItems[$0] }
-        if let id = removedItems.first?.id {
-            print("Deleted task id: \(id)")
-            NotificationManager.instance.cancelNotification(to: id)
-        }
-        // Remove items
-        boards[boardIndex].boardSections[sectionIndex].sectionItems.remove(atOffsets: indexSet)
-
-        // Remove the section if it's empty
-        if boards[boardIndex].boardSections[sectionIndex].sectionItems.isEmpty {
-            boards[boardIndex].boardSections.remove(at: sectionIndex)
-        }
+        manager.deleteItem(for: board, from: section, at: indexSet)
     }
     
     // MARK: MOVE ITEM
-    func moveItem(from: IndexSet, to: Int, for section: SectionModel, for board: BoardModel) {
-        
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return
-        }
-        guard let sectionIndex = boards[boardIndex].boardSections.firstIndex(where: { $0.id == section.id }) else {
-            return
-        }
-        
-        boards[boardIndex].boardSections[sectionIndex].sectionItems.move(fromOffsets: from, toOffset: to)
+    func moveItem(from: IndexSet, to: Int, for section: Section, for board: Board) {
+        manager.moveItem(from: from, to: to, for: section, for: board)
     }
     
     // MARK: UPDATE ITEM
-    func updateItemCheckmark(item: ItemModel, forSection section: SectionModel, forBoard board: BoardModel) {
-            
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return
-        }
-        guard let sectionIndex = boards[boardIndex].boardSections.firstIndex(where: { $0.id == section.id }) else {
-            return
-        }
-        
-        if let itemIndex = boards[boardIndex].boardSections[sectionIndex].sectionItems.firstIndex(
-            where: { $0.id == item.id
-            }) {
-            boards[boardIndex].boardSections[sectionIndex].sectionItems[itemIndex] = item.updateCompletion()
-        }
+    func updateItemCheckmark(task: TaskModel, forSection section: Section, forBoard board: Board) {
+        manager.updateItemCheckmark(task: task, forSection: section, forBoard: board)
     }
     
     func updateItemContent(newTitle: String, newDescription: String, newStartingTime: Date?,
-                           remindMe: Bool, priority: String?, item: ItemModel, forSection section: SectionModel, forBoard board: BoardModel) {
-            
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return
-        }
-        guard let sectionIndex = boards[boardIndex].boardSections.firstIndex(where: { $0.id == section.id }) else {
-            return
-        }
-        
-        if let date = newStartingTime {
-            if remindMe {
-                NotificationManager.instance.cancelNotification(to: item.id)
-                NotificationManager.instance
-                    .scheduleNotification(
-                        taskTitle: newTitle,
-                        date: date,
-                        id: item.id
-                    )
-            } else {
-                NotificationManager.instance.cancelNotification(to: item.id)
-            }
-        }
-        
-        if let itemIndex = boards[boardIndex].boardSections[sectionIndex].sectionItems.firstIndex(
-            where: { $0.id == item.id
-            }) {
-            boards[boardIndex].boardSections[sectionIndex].sectionItems[itemIndex] = item
-                .updateItemContent(newTitle: newTitle, newDescription: newDescription,
-                                   newStartingTime: newStartingTime, newRemindMeState: remindMe, newPriority: priority)
-        }
+                           remindMe: Bool, priority: String?, item: TaskModel, forSection section: Section, forBoard board: Board) {
+        manager.updateItemContent(newTitle: newTitle, newDescription: newDescription, newStartingTime: newStartingTime, remindMe: remindMe, priority: priority, item: item, forSection: section, forBoard: board)
     }
     
     // MARK: UPDATE BOARD
-    func updateBoardFavoriteState(forBoard board: BoardModel) {
-            
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return
-        }
-        
-        boards[boardIndex] = board.updateCompletion()
-
+    func updateBoardFavoriteState(forBoard board: Board) {
+        manager.updateBoardFavoriteState(forBoard: board)
     }
     
-    // MARK: SAVE
-    func saveSections() {
-        if let encodedData = try? JSONEncoder().encode(boards) {
-            UserDefaults.standard.set(encodedData, forKey: itemsKey)
-        }
-    }
-    
-    // MARK: 
-    func completedFractions(for section: SectionModel) -> CGFloat {
-        let numberOfChecked = section.sectionItems.count(
-            where: { $0.isCompleted == true
-            })
-        return (CGFloat(numberOfChecked) / CGFloat(section.sectionItems.count))
+    // MARK:
+    func completedFractions(for section: Section) -> CGFloat {
+        return manager.completedFractions(for: section)
     }
     
     
-    func isSectionsEmptyInTheBoard(for board: BoardModel) -> Bool {
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return false
-        }
-        
-        return boards[boardIndex].boardSections.isEmpty
-        
+    func isSectionsEmptyInTheBoard(for board: Board) -> Bool {
+        manager.isSectionsEmptyInTheBoard(for: board)
     }
     
-    func sectionForSelectedTask(_ task: ItemModel, board: BoardModel) -> SectionModel? {
-        // Logic to find the section containing the selected task
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
-            return nil
-        }
-        return boards[boardIndex].boardSections.first { $0.sectionItems.contains(task) }
+    func sectionForSelectedTask(_ task: TaskModel, board: Board) -> Section? {
+        manager.sectionForSelectedTask(task, board: board)
     }
     
-    func getBoardIndex(for board: BoardModel) -> Int { // fix if not founded
-        guard let boardIndex = boards.firstIndex(where: { $0.id == board.id }) else {
+    func getBoardIndex(for board: Board) -> Int {
+        if let boardIndex = boards.firstIndex(where: { $0.id == board.id }) {
+            return boardIndex
+        } else {
             return 0
         }
-        return boardIndex
     }
+    
 }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 /*
  MVVM Architecture
@@ -18,15 +19,20 @@ import SwiftUI
 @main
 struct TodoListApp: App {
     
-    @State var listViewModel: ListViewModel = ListViewModel()
-    
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+
     var body: some Scene {
         WindowGroup {
-            
-            NavigationStack {
-                MainView()
-            }
-            .environment(listViewModel)
+            RootScreen()
         }
     }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    FirebaseApp.configure()
+      print("Configured Firebase")
+    return true
+  }
 }
