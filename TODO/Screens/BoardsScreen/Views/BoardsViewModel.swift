@@ -14,7 +14,7 @@ class BoardsViewModel: ObservableObject {
     @Published var haveAccessboards: [NewBoard] = []
     
     @Published var cancellable = Set<AnyCancellable>()
-    
+        
     init() {
         getYourBoards()
         getBoardsYouHaveAccessToo()
@@ -53,6 +53,19 @@ class BoardsViewModel: ObservableObject {
         } catch {
             print("Failed to get the user id in getBoards.")
         }
+    }
+    
+    func deleteBoard(boardID: String) {
+        do {
+            let user = try AuthenticationManager.shared.getAuthenticatedUser()
+            FirebaseFirestore.shared.deleteBoard(boardID: boardID, userID: user.uid)
+        } catch {
+            print(print("Failed to get the user id in deleteBoard."))
+        }
+    }
+    
+    func updateBoardFavoriteState(boardID: String, state: Bool) {
+        FirebaseFirestore.shared.updateBoardFavoriteState(boardID: boardID, state: state)
     }
     
 }

@@ -11,7 +11,7 @@ struct TaskView: View {
     
     // MARK: PROPERTIES
     let selectedTask: TaskModel
-    let inSection: Section
+    let inSection: SectionModel
     let inBoard: Board
     
     @Environment(\.dismiss) var dismiss
@@ -106,15 +106,15 @@ extension TaskView {
     
     func updateButtonPressed() {
         if newTitleAppropriate() {
-            listViewModel.updateItemContent(
-                newTitle: textFieldText,
-                newDescription: textEditorText,
-                newStartingTime: showTimePicker ? pickerSelection : nil,
-                remindMe: remindMe, priority: priority,
-                item: selectedTask,
-                forSection: inSection,
-                forBoard: inBoard
-            )
+//            listViewModel.updateItemContent(
+//                newTitle: textFieldText,
+//                newDescription: textEditorText,
+//                newStartingTime: showTimePicker ? pickerSelection : nil,
+//                remindMe: remindMe, priority: priority,
+//                item: selectedTask,
+//                forSection: inSection,
+//                forBoard: inBoard
+//            )
             dismiss()
         }
         
@@ -142,7 +142,7 @@ extension TaskView {
                 isCompleted: false,
                 remindMe: false, priority: Strings.Blue
             ),
-            inSection: Section(
+            inSection: SectionModel(
                 sectionTitle: "Section2",
                 sectionItems: [
                     TaskModel(

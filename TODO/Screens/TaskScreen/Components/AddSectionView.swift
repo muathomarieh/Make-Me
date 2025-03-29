@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddSectionView: View {
     
-    let inBoard: Board
+    let inBoard: NewBoard
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var listViewModel: ListViewModel
     @State var textFieldText: String = ""
@@ -38,7 +38,7 @@ struct AddSectionView: View {
     func saveButtonPressed() {
         if textIsAppropriate() {
             do {
-                try listViewModel.addSection(title: textFieldText, for: inBoard)
+                try BoardsManager.shared.addSection(title: textFieldText, for: inBoard.id)
             } catch {
                 print(error)
             }
@@ -60,7 +60,7 @@ struct AddSectionView: View {
 
 #Preview {
     NavigationView {
-        AddSectionView(inBoard: Board(boardName: "BoardTestname", boardImage: "testImage"))
+        AddSectionView(inBoard: NewBoard(boardName: "", boardImage: "", creatorId: "1234"))
     }
     .environmentObject(ListViewModel())
 }

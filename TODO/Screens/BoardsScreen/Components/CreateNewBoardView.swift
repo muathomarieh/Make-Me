@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CreateNewBoardView: View {
     
-    @EnvironmentObject var listViewModel: ListViewModel
     @Environment(\.dismiss) var dismiss
     
     @State var textFieldText: String = ""
@@ -48,7 +47,8 @@ struct CreateNewBoardView: View {
             .scrollIndicators(.hidden)
             AppButton(buttonTitle: "New Board") {
                 do {
-                    try listViewModel.addBoard(boardName: textFieldText, boardImage: pickedImage)
+                    let user = try AuthenticationManager.shared.getAuthenticatedUser()
+                    try BoardsManager.shared.addBoard(boardName: textFieldText, boardImage: pickedImage, userID: user.uid)
                 } catch {
                     print(error)
                 }

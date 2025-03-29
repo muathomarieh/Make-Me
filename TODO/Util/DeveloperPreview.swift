@@ -17,7 +17,7 @@ class DeveloperPreview {
         boardImage: "testImage",
         isFavorite: true,
         boardSections: [
-            Section(
+            SectionModel(
                 sectionTitle: "Section",
                 sectionItems: [TaskModel(
                     title: "ItemModelTitle",

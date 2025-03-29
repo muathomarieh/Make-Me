@@ -26,7 +26,7 @@ struct BoardChanged: Identifiable, Codable {
     let boardName: String
     let boardImage: String
     var isFavorite: Bool
-    var boardSections: [Section]
+    var boardSections: [SectionModel]
     let boardOwner: String
     let boardUsers: [String]
 
@@ -34,7 +34,7 @@ struct BoardChanged: Identifiable, Codable {
          boardName: String,
          boardImage: String,
          isFavorite: Bool = false,
-         boardSections: [Section] = [],
+         boardSections: [SectionModel] = [],
          boardOwner: String,
          boardUsers: [String]) {
         self.id = id

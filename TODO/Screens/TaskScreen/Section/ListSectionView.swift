@@ -11,16 +11,19 @@ import ConfettiSwiftUI
 struct ListSectionView: View {
     
     // MARK: PROPERTIES
-    let selectedBoard: Board
-    
-    @EnvironmentObject var listViewModel: ListViewModel
+    let board: NewBoard
+    @StateObject var sectionsVM: SectionViewModel
+    init(board: NewBoard) {
+        self.board = board
+        _sectionsVM = StateObject(wrappedValue: SectionViewModel(boardID: board.id))
+    }
     @Environment(\.dismiss) var dismiss
     
     @State private var showAddTask = false
     @State private var showAddSectionSheet: Bool = false
     @State private var showTaskView: Bool = false
 
-    @State private var selectedSection: Section?
+    @State private var selectedSection: NewSection?
     @State private var selectedTask: TaskModel?
     
     @State private var confettiTriggers = [String: Int]()
@@ -47,17 +50,14 @@ struct ListSectionView: View {
                     isEditing.toggle()
                 }
                     
-                if listViewModel.isSectionsEmptyInTheBoard(for: selectedBoard) {
-                    NoItemsView(inBoard: selectedBoard)
+                if sectionsVM.sections.isEmpty {
+                    NoItemsView(inBoard: board)
                         .transition(AnyTransition.opacity.animation(.easeIn))
                 } else {
                     List {
-                        let boardIndex = listViewModel.getBoardIndex(for: selectedBoard)
-                        let boardSections = listViewModel.boards[boardIndex].boardSections
-                        
-                        ForEach(boardSections) { section in
-                            SwiftUI.Section {
-                                sectionContent(for: section)
+                        ForEach(sectionsVM.sections) { section in
+                            Section {
+                                SectionContent(section: section, boardID: board.id)
                                 addTaskToSection(for: section)
                             } header: {
                                 SectionHeaderView(
@@ -81,24 +81,24 @@ struct ListSectionView: View {
                  isEditing ? .constant(.active) : .constant(.inactive)
             )
             .sheet(item: $selectedTask) { selectedTask in
-                if let section = listViewModel.sectionForSelectedTask(selectedTask, board: selectedBoard) {
-                    TaskView(
-                        selectedTask: selectedTask,
-                        inSection: section,
-                        inBoard: selectedBoard
-                    )
-                } else {
-                    Text("Task not founded")
-                }
+//                if let section = listViewModel.sectionForSelectedTask(selectedTask, board: selectedBoard) {
+//                    TaskView(
+//                        selectedTask: selectedTask,
+//                        inSection: section,
+//                        inBoard: selectedBoard
+//                    )
+//                } else {
+//                    Text("Task not founded")
+//                }
             }
             .sheet(item: $selectedSection) { section in
-                AddTask(selectedSection: section, inBoard: selectedBoard)
+                AddTask(section: section, inBoard: board)
             }
             
             CircleAddButton {
                 showAddSectionSheet.toggle()
             }.sheet(isPresented: $showAddSectionSheet) {
-                AddSectionView(inBoard: selectedBoard)
+                AddSectionView(inBoard: board)
                     .padding(.top, 20)
                     .presentationDetents([.medium])
                     
@@ -113,7 +113,7 @@ struct ListSectionView: View {
 extension ListSectionView {
     
     struct SectionHeaderView: View {
-        let section: Section
+        let section: NewSection
         @Binding var confettiTrigger: Int
         @EnvironmentObject var listViewModel: ListViewModel
 
@@ -122,17 +122,17 @@ extension ListSectionView {
                 Text(section.sectionTitle)
                     .foregroundStyle(.white)
                 
-                ProgressView("Loading...",
-                             value: listViewModel
-                    .completedFractions(for: section),
-                             total: 1)
-                .progressViewStyle(CustomProgressBar())
-                .confettiCannon(trigger: $confettiTrigger, num: 30)
-                .onChange(of: listViewModel.completedFractions(for: section)) {
-                    if listViewModel.completedFractions(for: section) == 1 {
-                        confettiTrigger += 1
-                    }
-                }
+//                ProgressView("Loading...",
+//                             value: listViewModel
+//                    .completedFractions(for: section),
+//                             total: 1)
+//                .progressViewStyle(CustomProgressBar())
+//                .confettiCannon(trigger: $confettiTrigger, num: 30)
+//                .onChange(of: listViewModel.completedFractions(for: section)) {
+//                    if listViewModel.completedFractions(for: section) == 1 {
+//                        confettiTrigger += 1
+//                    }
+//                }
             }
             .frame(height: 20)
         }
@@ -143,7 +143,7 @@ extension ListSectionView {
 // MARK: FUCTIONS
 extension ListSectionView {
     
-    private func addTaskToSection(for section: Section) -> some View {
+    private func addTaskToSection(for section: NewSection) -> some View {
         AppButton(buttonTitle: Strings.ADD) {
             if selectedSection == nil {
                 selectedSection = section
@@ -158,49 +158,7 @@ extension ListSectionView {
         )
     }
     
-    private func taskRow(for task: TaskModel, in section: Section) -> some View {
-        Button {
-            selectedTask = task
-            print("Selected Task: \(selectedTask?.title ?? "None")")
-        } label: {
-            ListRowView(item: task) {
-                withAnimation(.linear) {
-                    listViewModel
-                        .updateItemCheckmark(task: task, forSection: section, forBoard: selectedBoard)
-                }
-            }
-        }
-//        .sheet(item: $selectedTask) { selectedTask in
-//            TaskView(
-//                selectedTask: selectedTask,
-//                inSection: section,
-//                inBoard: selectedBoard
-//            )
-//        }
-    }
-    
-    private func sectionContent(for section: Section) -> some View {
-        ForEach(section.sectionItems) { task in
-            taskRow(for: task, in: section)
-                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    Button("Check") {
-                        withAnimation {
-                            listViewModel
-                                .updateItemCheckmark(task: task, forSection: section, forBoard: selectedBoard)
-                        }
-                    }
-                }
-        }
-        .onDelete { indexSet in
-            handleDelete(indexSet, for: section)
-        }
-        .onMove { indexSet, destination in
-            handleMove(indexSet, destination, for: section)
-        }
-        
-    }
-    
-    private func headerContent(for section: Section) -> some View {
+    private func headerContent(for section: NewSection) -> some View {
         SectionHeaderView(
             section: section,
             confettiTrigger: Binding(
@@ -210,24 +168,24 @@ extension ListSectionView {
         )
     }
     
-    private func handleDelete(_ indexSet: IndexSet, for section: Section) {
-        withAnimation(.easeIn) {
-            listViewModel
-                .deleteItem(for: selectedBoard, from: section, at: indexSet)
-        }
-    }
-
-    private func handleMove(
-        _ indexSet: IndexSet,
-        _ destination: Int,
-        for section: Section
-    ) {
-        listViewModel.moveItem(
-            from: indexSet,
-            to: destination,
-            for: section, for: selectedBoard
-        )
-    }
+//    private func handleDelete(_ indexSet: IndexSet, for section: Section) {
+//        withAnimation(.easeIn) {
+//            listViewModel
+//                .deleteItem(for: selectedBoard, from: section, at: indexSet)
+//        }
+//    }
+//
+//    private func handleMove(
+//        _ indexSet: IndexSet,
+//        _ destination: Int,
+//        for section: Section
+//    ) {
+//        listViewModel.moveItem(
+//            from: indexSet,
+//            to: destination,
+//            for: section, for: selectedBoard
+//        )
+//    }
     
 }
 
@@ -235,7 +193,7 @@ extension ListSectionView {
 #Preview {
     NavigationStack {
         ListSectionView(
-            selectedBoard: DeveloperPreview.shared.board
+            board: NewBoard(boardName: "Board1", boardImage: "testImage", creatorId: "1234")
         )
     }
     .environmentObject(ListViewModel())

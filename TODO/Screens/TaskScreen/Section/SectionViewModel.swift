@@ -29,21 +29,10 @@ class SectionViewModel: ObservableObject {
                 
             } receiveValue: { [weak self] sections in
                 self?.sections = sections
+                print(sections)
             }
             .store(in: &cancellable)
 
     }
     
-    func sectionTasks(sectionID: String) {
-        guard let boardID = boardID else {
-            return
-        }
-        FirebaseFirestore.shared.fetchTasksToSection(boardID: boardID, sectionID: section)
-            .sink { _ in
-                
-            } receiveValue: { [weak self] sections in
-                self?.sections = sections
-            }
-            .store(in: &cancellable)
-    }
 }

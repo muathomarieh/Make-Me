@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct Section: Identifiable, Codable, Hashable {
-    static func == (lhs: Section, rhs: Section) -> Bool {
+struct SectionModel: Identifiable, Codable, Hashable {
+    static func == (lhs: SectionModel, rhs: SectionModel) -> Bool {
         return lhs.id == rhs.id
     }
     
@@ -24,10 +24,10 @@ struct Section: Identifiable, Codable, Hashable {
     
 }
 
-struct NewSection: Identifiable, Codable, Hashable {
-//    static func == (lhs: Section, rhs: Section) -> Bool {
-//        return lhs.id == rhs.id
-//    }
+struct NewSection: Identifiable, Codable, Hashable, Equatable {
+    static func == (lhs: NewSection, rhs: NewSection) -> Bool {
+        return lhs.id == rhs.id
+    }
     
     let id: String
     let sectionTitle: String

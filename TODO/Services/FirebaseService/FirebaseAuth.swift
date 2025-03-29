@@ -23,7 +23,7 @@ final class AuthenticationManager {
     
     func createUser(email: String, password: String, name: String) async throws {
         let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
-        try await FirebaseFirestore.shared.addUser(user: UserModel(id: authDataResult.user.uid, name: name))
+        try await FirebaseFirestore.shared.addUser(user: NewUserModel(id: authDataResult.user.uid, name: name))
 
     }
     
@@ -49,7 +49,7 @@ extension AuthenticationManager {
     
     func signIn(credential: AuthCredential, name: String) async throws {
         let authDataResult = try await Auth.auth().signIn(with: credential)
-        try await FirebaseFirestore.shared.addUser(user: UserModel(id: authDataResult.user.uid, name: name))
+        try await FirebaseFirestore.shared.addUser(user: NewUserModel(id: authDataResult.user.uid, name: name))
         print(authDataResult.user.uid)
         print(name)
     }

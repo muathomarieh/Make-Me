@@ -10,11 +10,10 @@ import SwiftUI
 struct AddTask: View {
     
     // MARK: PROPERTIES
-    let selectedSection: Section
-    let inBoard: Board
+    let section: NewSection
+    let inBoard: NewBoard
     
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var listViewModel: ListViewModel
     // INPUT
     @State var textFieldText: String = ""
     @State var textEditorText: String = ""
@@ -41,7 +40,7 @@ struct AddTask: View {
             .ignoresSafeArea()
             
             VStack {
-                ListSectionTopBarView(title: selectedSection.sectionTitle, topBarType: .task) {
+                ListSectionTopBarView(title: section.sectionTitle, topBarType: .task) {
                     
                 } 
                 
@@ -98,11 +97,11 @@ extension AddTask {
     func saveButtonPressed() {
         if textIsAppropriate() {
             do {
-                try listViewModel
+                try BoardsManager.shared
                     .addItem(task:
                                 TaskModel(title: textFieldText, description: textEditorText, startingTime: showTimePicker ? pickerSelection : nil, isCompleted: false, remindMe: remindMe, priority: priority),
-                             forSection: selectedSection,
-                             forBoard: inBoard)
+                             forSection: section,
+                             forBoard: inBoard.id)
             } catch {
                 print(error)
             }
@@ -124,8 +123,8 @@ extension AddTask {
 #Preview {
     NavigationView {
         AddTask(
-            selectedSection: DeveloperPreview.shared.board.boardSections.first!,
-            inBoard: DeveloperPreview.shared.board
+            section: NewSection(sectionTitle: "1234"),
+            inBoard: NewBoard(boardName: "", boardImage: "testImage", creatorId: "124")
         )
     }
     .environmentObject(ListViewModel())

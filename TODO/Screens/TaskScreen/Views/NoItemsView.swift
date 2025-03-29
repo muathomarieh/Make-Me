@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NoItemsView: View {
     
-    let inBoard: Board
+    let inBoard: NewBoard
     @State var animate: Bool = false
     let maroonColor = Color("MaroonColor")
     
@@ -76,7 +76,7 @@ struct NoItemsView: View {
 
 #Preview {
     NavigationView {
-        NoItemsView(inBoard: Board(boardName: "BoardTestname", boardImage: "testImage"))
+        NoItemsView(inBoard: NewBoard(boardName: "", boardImage: "", creatorId: ""))
             .navigationTitle("Title")
     }
 }

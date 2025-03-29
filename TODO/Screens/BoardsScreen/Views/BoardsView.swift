@@ -9,14 +9,13 @@ import SwiftUI
 
 struct BoardsView: View {
     
-    @EnvironmentObject var listViewModel: ListViewModel
     @StateObject var vm: BoardsViewModel = BoardsViewModel()
     
     @State var text: String = ""
     @State var isFavorite: Bool = true
     @State var showListSectionView: Bool = false
     @State var showAddBoardView: Bool = false
-    @State var selectedBoard: Board? = nil
+    @State var selectedBoard: NewBoard? = nil
     
     var body: some View {
         ZStack {
@@ -33,22 +32,38 @@ struct BoardsView: View {
                 VStack {
                     TextFieldView(
                         placeHolder: "Search for a board...",
-                        textFieldText: $listViewModel.text
+                        textFieldText: $text
                     )
                     .offset(y: -20)
                     
                     ScrollView {
                         VStack(spacing: 20) {
-                            ForEach(listViewModel.boards) { board in
+                            LabelledDivider(label: "Yours", color: .white)
+                            ForEach(vm.yourBoards) { board in
                                 BoardCardView(
                                     boardName: board.boardName,
                                     imageName: board.boardImage,
                                     isFavorite: board.isFavorite
                                 ) {
-                                    listViewModel
-                                        .updateBoardFavoriteState(
-                                            forBoard: board
-                                        )
+                                    vm.updateBoardFavoriteState(boardID: board.id, state: board.isFavorite)
+                                }
+                                .onTapGesture {
+                                    selectedBoard = board
+                                    showListSectionView = true
+                                }
+                                .contextMenu {
+                                    
+                                    Text("delete board")
+                                }
+                            }
+                            LabelledDivider(label: "YouJoined", color: .white)
+                            ForEach(vm.haveAccessboards) { board in
+                                BoardCardView(
+                                    boardName: board.boardName,
+                                    imageName: board.boardImage,
+                                    isFavorite: board.isFavorite
+                                ) {
+                                    vm.updateBoardFavoriteState(boardID: board.id, state: board.isFavorite)
                                 }
                                 .onTapGesture {
                                     selectedBoard = board
@@ -65,7 +80,7 @@ struct BoardsView: View {
             }
             .navigationDestination(isPresented: $showListSectionView) {
                 if let selectedBoard = selectedBoard {
-                    ListSectionView(selectedBoard: selectedBoard)
+                    ListSectionView(board: selectedBoard)
                 }
             }
                 

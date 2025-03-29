@@ -26,9 +26,21 @@ struct TopBarView: View {
                 }
                 
                 if barType == .friends {
-                    Image(systemName: "text.justify")
-                        .resizable()
-                        .frame(width: 30, height: 30)
+                    Menu {
+                        Button("Open in Preview") {
+                            
+                        }
+                    } label: {
+                        Image(systemName: "text.justify")
+                            .resizable()
+                            .frame(width: 30, height: 30)
+                    }
+//                    Image(systemName: "text.justify")
+//                        .resizable()
+//                        .frame(width: 30, height: 30)
+//                        .onTapGesture {
+//                            Menu
+//                        }
                 }
                 Spacer()
                 ProfileImageView(image: image)

@@ -384,13 +384,13 @@ import Combine
 class ListViewModel: ObservableObject {
     
     @Published var boards: [Board] = []
-    @Published var user: UserModel? = nil
+    @Published var user: NewUserModel? = nil
     @Published var manager = BoardsManager.shared
     @Published var text = ""
     @Published var cancellable = Set<AnyCancellable>()
     
     init() {
-        getBoards()
+        //getBoards()
        
     }
     
@@ -410,17 +410,17 @@ class ListViewModel: ObservableObject {
     }
     
     
-    func getBoards() {
-        
-        $text
-            .combineLatest(manager.$boards)
-            .receive(on: DispatchQueue.main)
-            .map(filterBoards)
-            .sink { [weak self] boards in
-                self?.boards = boards
-            }
-            .store(in: &cancellable)
-    }
+//    func getBoards() {
+//        
+//        $text
+//            .combineLatest(manager.$boards)
+//            .receive(on: DispatchQueue.main)
+//            .map(filterBoards)
+//            .sink { [weak self] boards in
+//                self?.boards = boards
+//            }
+//            .store(in: &cancellable)
+//    }
     
     private func filterBoards(text: String, boards: [Board]) -> [Board] {
         guard !text.isEmpty else {
@@ -433,75 +433,75 @@ class ListViewModel: ObservableObject {
         }
     }
     
-    // MARK: ADDING PART
-    func addBoard(boardName: String, boardImage: String) throws {
-        let user = try AuthenticationManager.shared.getAuthenticatedUser()
-        try manager.addBoard(boardName: boardName, boardImage: boardImage, userID: user.uid)
-    }
-    
-    func addSection(title: String, for board: Board) throws {
-        try manager.addSection(title: title, for: board)
-    }
-    
-    func addItem(
-        task: TaskModel,
-        forSection section: Section,
-        forBoard board: Board
-    ) throws {
-        try manager.addItem(task: task, forSection: section, forBoard: board)
-    }
-    
-    
-    
-    // MARK: DELETE ITEM
-    func deleteItem(
-        for board: Board,
-        from section: Section,
-        at indexSet: IndexSet
-    ) {
-        manager.deleteItem(for: board, from: section, at: indexSet)
-    }
-    
-    // MARK: MOVE ITEM
-    func moveItem(from: IndexSet, to: Int, for section: Section, for board: Board) {
-        manager.moveItem(from: from, to: to, for: section, for: board)
-    }
-    
-    // MARK: UPDATE ITEM
-    func updateItemCheckmark(task: TaskModel, forSection section: Section, forBoard board: Board) {
-        manager.updateItemCheckmark(task: task, forSection: section, forBoard: board)
-    }
-    
-    func updateItemContent(newTitle: String, newDescription: String, newStartingTime: Date?,
-                           remindMe: Bool, priority: String?, item: TaskModel, forSection section: Section, forBoard board: Board) {
-        manager.updateItemContent(newTitle: newTitle, newDescription: newDescription, newStartingTime: newStartingTime, remindMe: remindMe, priority: priority, item: item, forSection: section, forBoard: board)
-    }
-    
-    // MARK: UPDATE BOARD
-    func updateBoardFavoriteState(forBoard board: Board) {
-        manager.updateBoardFavoriteState(forBoard: board)
-    }
-    
-    // MARK:
-    func completedFractions(for section: Section) -> CGFloat {
-        return manager.completedFractions(for: section)
-    }
-    
-    
-    func isSectionsEmptyInTheBoard(for board: Board) -> Bool {
-        manager.isSectionsEmptyInTheBoard(for: board)
-    }
-    
-    func sectionForSelectedTask(_ task: TaskModel, board: Board) -> Section? {
-        manager.sectionForSelectedTask(task, board: board)
-    }
-    
-    func getBoardIndex(for board: Board) -> Int {
-        if let boardIndex = boards.firstIndex(where: { $0.id == board.id }) {
-            return boardIndex
-        } else {
-            return 0
-        }
-    }
+//    // MARK: ADDING PART
+//    func addBoard(boardName: String, boardImage: String) throws {
+//        let user = try AuthenticationManager.shared.getAuthenticatedUser()
+//        try manager.addBoard(boardName: boardName, boardImage: boardImage, userID: user.uid)
+//    }
+//    
+//    func addSection(title: String, for board: Board) throws {
+//        try manager.addSection(title: title, for: board)
+//    }
+//    
+//    func addItem(
+//        task: TaskModel,
+//        forSection section: SectionModel,
+//        forBoard board: Board
+//    ) throws {
+//        try manager.addItem(task: task, forSection: section, forBoard: board)
+//    }
+//    
+//    
+//    
+//    // MARK: DELETE ITEM
+//    func deleteItem(
+//        for board: Board,
+//        from section: SectionModel,
+//        at indexSet: IndexSet
+//    ) {
+//        manager.deleteItem(for: board, from: section, at: indexSet)
+//    }
+//    
+//    // MARK: MOVE ITEM
+//    func moveItem(from: IndexSet, to: Int, for section: SectionModel, for board: Board) {
+//        manager.moveItem(from: from, to: to, for: section, for: board)
+//    }
+//    
+//    // MARK: UPDATE ITEM
+//    func updateItemCheckmark(task: TaskModel, forSection section: SectionModel, forBoard board: Board) {
+//        manager.updateItemCheckmark(task: task, forSection: section, forBoard: board)
+//    }
+//    
+//    func updateItemContent(newTitle: String, newDescription: String, newStartingTime: Date?,
+//                           remindMe: Bool, priority: String?, item: TaskModel, forSection section: SectionModel, forBoard board: Board) {
+//        manager.updateItemContent(newTitle: newTitle, newDescription: newDescription, newStartingTime: newStartingTime, remindMe: remindMe, priority: priority, item: item, forSection: section, forBoard: board)
+//    }
+//    
+//    // MARK: UPDATE BOARD
+//    func updateBoardFavoriteState(forBoard board: Board) {
+//        manager.updateBoardFavoriteState(forBoard: board)
+//    }
+//    
+//    // MARK:
+//    func completedFractions(for section: SectionModel) -> CGFloat {
+//        return manager.completedFractions(for: section)
+//    }
+//    
+//    
+//    func isSectionsEmptyInTheBoard(for board: Board) -> Bool {
+//        manager.isSectionsEmptyInTheBoard(for: board)
+//    }
+//    
+//    func sectionForSelectedTask(_ task: TaskModel, board: Board) -> SectionModel? {
+//        manager.sectionForSelectedTask(task, board: board)
+//    }
+//    
+//    func getBoardIndex(for board: Board) -> Int {
+//        if let boardIndex = boards.firstIndex(where: { $0.id == board.id }) {
+//            return boardIndex
+//        } else {
+//            return 0
+//        }
+//    }
     
 }
