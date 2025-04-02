@@ -16,7 +16,7 @@ struct SignScreen: View {
     @State var nameTextField: String = ""
     
     @State var showSheet: Bool = false
-    @State var selectedProfileImageIndex: Int = 0
+    @State var selectedProfileImage: Int = 0
     @State var showSignUp: Bool = true
     
     @Binding var showSignScreen: Bool
@@ -110,29 +110,7 @@ struct SignScreen: View {
             
         }
         .sheet(isPresented: $showSheet) {
-            ScrollView(.horizontal) {
-                HStack {
-                    ForEach(0..<50) { index in
-                        Image("testImage")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                            .clipShape(.circle)
-                            .overlay {
-                                Circle()
-                                    .stroke(style: StrokeStyle(lineWidth: 2))
-                                    .foregroundStyle(
-                                        selectedProfileImageIndex == index ? Color.accentColor : .white)
-                            }
-                            .onTapGesture {
-                                selectedProfileImageIndex = index
-                                showSheet.toggle()
-                            }
-                            .padding()
-                    }
-                }
-            }
-            .presentationDetents([.height(150)])
+            ProfileImagePickerView(selectedProfileImage: $selectedProfileImage, showSheet: $showSheet, profileImagePickerViewType: .signing)
         }
     }
 }

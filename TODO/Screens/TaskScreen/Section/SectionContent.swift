@@ -11,13 +11,19 @@ struct SectionContent: View {
     
     let section: NewSection
     let boardID: String
-    
+    let onProgressChange: (CGFloat) -> Void
+
     @StateObject var taskVM: TasksViewModel
-    init(section: NewSection, boardID: String) {
+    
+    @State private var selectedTask: TaskModel?
+    
+    init(section: NewSection, boardID: String, progress: @escaping (CGFloat) -> Void) {
         self.section = section
         self.boardID = boardID
+        self.onProgressChange = progress
         _taskVM = StateObject(wrappedValue: TasksViewModel(boardID: boardID, sectionID: section.id))
     }
+
     var body: some View {
         ForEach(taskVM.tasks) { task in
                 taskRow(for: task, in: section)
@@ -35,11 +41,24 @@ struct SectionContent: View {
             .onMove { indexSet, destination in
                 //handleMove(indexSet, destination, for: section)
             }
+            .sheet(item: $selectedTask) { selectedTask in
+                    TaskView(
+                        selectedTask: selectedTask,
+                        inSection: section,
+                        boardID: boardID
+                    ).environmentObject(taskVM)
+            }
+            .onAppear {
+                onProgressChange(taskVM.progress)
+            }
+            .onChange(of: taskVM.progress) { oldValue, newValue in
+                onProgressChange(newValue)
+            }
     }
     
     private func taskRow(for task: TaskModel, in section: NewSection) -> some View {
         Button {
-            //selectedTask = task
+            selectedTask = task
         } label: {
             ListRowView(item: task) {
                 withAnimation(.linear) {
@@ -51,5 +70,7 @@ struct SectionContent: View {
 }
 
 #Preview {
-    SectionContent(section: NewSection(id: "sd", sectionTitle: "NewSection"), boardID: "1234")
+    SectionContent(section: NewSection(id: "sd", sectionTitle: "NewSection"), boardID: "1234", progress: { _ in
+        
+    })
 }

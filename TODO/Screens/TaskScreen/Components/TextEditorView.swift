@@ -9,9 +9,19 @@ import SwiftUI
 
 struct TextEditorView: View {
     @Binding var textEditorText: String
+    var placeholder: String = "Task Description..."
+    var placeholderColor: Color = .gray
+    var textColor: Color = .black
+
     var body: some View {
-        ZStack(alignment: .center) {
-                   
+        ZStack(alignment: .topLeading) {
+            if textEditorText.isEmpty {
+                Text(placeholder)
+                    .foregroundColor(placeholderColor)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 12)
+            }
+            
             TextEditor(text: $textEditorText)
                 .font(.headline)
                 .scrollContentBackground(.hidden)
@@ -19,14 +29,11 @@ struct TextEditorView: View {
                 .padding()
                 .background(Color.appGray)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-            
-            if textEditorText.isEmpty {
-                Text("Task Description...")
-                    .foregroundColor(.gray.opacity(0.6))
-            }
+                .foregroundColor(textColor)
         }
     }
 }
+
 
 #Preview {
     TextEditorView(textEditorText: .constant(""))

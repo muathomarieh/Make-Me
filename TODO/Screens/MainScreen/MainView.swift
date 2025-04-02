@@ -9,8 +9,10 @@ import SwiftUI
 
 struct MainView: View {
     
-    @EnvironmentObject var listViewModel: ListViewModel
-    init() {
+    @Binding var showSignScreen: Bool
+    
+    init(showSignScreen: Binding<Bool>) {
+        _showSignScreen = showSignScreen
         let appearance = UITabBarAppearance()
         
         appearance.backgroundColor = UIColor(
@@ -63,7 +65,7 @@ struct MainView: View {
                 }
 
                 Tab("Friends", systemImage: "person") {
-                    FriendsView()
+                    FriendsView(showSignScreen: $showSignScreen)
                 }
 
                 Tab("Boards", systemImage: "checklist") {
@@ -81,6 +83,6 @@ struct MainView: View {
 }
 
 #Preview {
-    MainView()
-        .environmentObject(ListViewModel())
+    MainView(showSignScreen: .constant(false))
+        .environmentObject(AppViewModel())
 }

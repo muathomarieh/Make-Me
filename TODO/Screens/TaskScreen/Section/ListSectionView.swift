@@ -18,7 +18,7 @@ struct ListSectionView: View {
         _sectionsVM = StateObject(wrappedValue: SectionViewModel(boardID: board.id))
     }
     @Environment(\.dismiss) var dismiss
-    
+
     @State private var showAddTask = false
     @State private var showAddSectionSheet: Bool = false
     @State private var showTaskView: Bool = false
@@ -28,6 +28,8 @@ struct ListSectionView: View {
     
     @State private var confettiTriggers = [String: Int]()
     @State private var isEditing = false
+    
+    @State private var sectionProgress: [String: CGFloat] = [:]
     
     // MARK: BODY
     var body: some View {
@@ -57,17 +59,21 @@ struct ListSectionView: View {
                     List {
                         ForEach(sectionsVM.sections) { section in
                             Section {
-                                SectionContent(section: section, boardID: board.id)
+                                SectionContent(section: section, boardID: board.id) { progress in
+                                    sectionProgress[section.id] = progress // Update progress state
+                                }
                                 addTaskToSection(for: section)
                             } header: {
                                 SectionHeaderView(
                                     section: section,
+                                    progress: sectionProgress[section.id] ?? 0.0,
                                     confettiTrigger: Binding(
                                         get: { confettiTriggers[section.id] ?? 0 },
                                         set: { confettiTriggers[section.id] = $0 }
                                     )
                                 )
                             }
+                            .listRowBackground(Color.white)
                         }
                     }
                     .listStyle(.automatic)
@@ -80,17 +86,6 @@ struct ListSectionView: View {
                 \.editMode,
                  isEditing ? .constant(.active) : .constant(.inactive)
             )
-            .sheet(item: $selectedTask) { selectedTask in
-//                if let section = listViewModel.sectionForSelectedTask(selectedTask, board: selectedBoard) {
-//                    TaskView(
-//                        selectedTask: selectedTask,
-//                        inSection: section,
-//                        inBoard: selectedBoard
-//                    )
-//                } else {
-//                    Text("Task not founded")
-//                }
-            }
             .sheet(item: $selectedSection) { section in
                 AddTask(section: section, inBoard: board)
             }
@@ -98,7 +93,7 @@ struct ListSectionView: View {
             CircleAddButton {
                 showAddSectionSheet.toggle()
             }.sheet(isPresented: $showAddSectionSheet) {
-                AddSectionView(inBoard: board)
+                AddSectionView(board: board)
                     .padding(.top, 20)
                     .presentationDetents([.medium])
                     
@@ -114,25 +109,24 @@ extension ListSectionView {
     
     struct SectionHeaderView: View {
         let section: NewSection
+        let progress: CGFloat
         @Binding var confettiTrigger: Int
-        @EnvironmentObject var listViewModel: ListViewModel
 
         var body: some View {
             HStack {
                 Text(section.sectionTitle)
                     .foregroundStyle(.white)
                 
-//                ProgressView("Loading...",
-//                             value: listViewModel
-//                    .completedFractions(for: section),
-//                             total: 1)
-//                .progressViewStyle(CustomProgressBar())
-//                .confettiCannon(trigger: $confettiTrigger, num: 30)
-//                .onChange(of: listViewModel.completedFractions(for: section)) {
-//                    if listViewModel.completedFractions(for: section) == 1 {
-//                        confettiTrigger += 1
-//                    }
-//                }
+                ProgressView("Loading...",
+                             value: self.progress,
+                             total: 1)
+                .progressViewStyle(CustomProgressBar())
+                .confettiCannon(trigger: $confettiTrigger, num: 30)
+                .onChange(of: progress) {
+                    if progress == 1 {
+                        confettiTrigger += 1
+                    }
+                }
             }
             .frame(height: 20)
         }
@@ -158,15 +152,6 @@ extension ListSectionView {
         )
     }
     
-    private func headerContent(for section: NewSection) -> some View {
-        SectionHeaderView(
-            section: section,
-            confettiTrigger: Binding(
-                get: { confettiTriggers[section.id] ?? 0 },
-                set: { confettiTriggers[section.id] = $0 }
-            )
-        )
-    }
     
 //    private func handleDelete(_ indexSet: IndexSet, for section: Section) {
 //        withAnimation(.easeIn) {
@@ -196,7 +181,7 @@ extension ListSectionView {
             board: NewBoard(boardName: "Board1", boardImage: "testImage", creatorId: "1234")
         )
     }
-    .environmentObject(ListViewModel())
+    .environmentObject(AppViewModel())
 }
 
 

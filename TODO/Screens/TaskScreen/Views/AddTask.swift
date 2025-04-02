@@ -127,6 +127,6 @@ extension AddTask {
             inBoard: NewBoard(boardName: "", boardImage: "testImage", creatorId: "124")
         )
     }
-    .environmentObject(ListViewModel())
+    .environmentObject(AppViewModel())
 }
 

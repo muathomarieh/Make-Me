@@ -11,10 +11,15 @@ struct AddSectionView: View {
     
     let inBoard: NewBoard
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var listViewModel: ListViewModel
     @State var textFieldText: String = ""
     @State var showAlert: Bool = false
     @State var alertTitle: String = ""
+    
+    @StateObject var sectionsVM: SectionViewModel
+    init(board: NewBoard) {
+        self.inBoard = board
+        _sectionsVM = StateObject(wrappedValue: SectionViewModel(boardID: board.id))
+    }
     
     var body: some View {
         ScrollView {
@@ -38,7 +43,7 @@ struct AddSectionView: View {
     func saveButtonPressed() {
         if textIsAppropriate() {
             do {
-                try BoardsManager.shared.addSection(title: textFieldText, for: inBoard.id)
+                try sectionsVM.addSection(title: textFieldText, for: inBoard.id)
             } catch {
                 print(error)
             }
@@ -60,8 +65,8 @@ struct AddSectionView: View {
 
 #Preview {
     NavigationView {
-        AddSectionView(inBoard: NewBoard(boardName: "", boardImage: "", creatorId: "1234"))
+        AddSectionView(board: NewBoard(boardName: "", boardImage: "", creatorId: "1234"))
     }
-    .environmentObject(ListViewModel())
+    .environmentObject(AppViewModel())
 }
 

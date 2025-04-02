@@ -11,11 +11,11 @@ struct TaskView: View {
     
     // MARK: PROPERTIES
     let selectedTask: TaskModel
-    let inSection: SectionModel
-    let inBoard: Board
+    let inSection: NewSection
+    let boardID: String
     
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var listViewModel: ListViewModel
+    @EnvironmentObject var taskVM: TasksViewModel
     // INPUT
     @State var textFieldText: String = ""
     @State var textEditorText: String = ""
@@ -106,15 +106,7 @@ extension TaskView {
     
     func updateButtonPressed() {
         if newTitleAppropriate() {
-//            listViewModel.updateItemContent(
-//                newTitle: textFieldText,
-//                newDescription: textEditorText,
-//                newStartingTime: showTimePicker ? pickerSelection : nil,
-//                remindMe: remindMe, priority: priority,
-//                item: selectedTask,
-//                forSection: inSection,
-//                forBoard: inBoard
-//            )
+            taskVM.updateTask(task: TaskModel(id: selectedTask.id, title: textFieldText, description: textEditorText, startingTime: showTimePicker ? pickerSelection : nil, isCompleted: selectedTask.isCompleted, remindMe: remindMe, priority: priority), secID: inSection.id)
             dismiss()
         }
         
@@ -142,23 +134,9 @@ extension TaskView {
                 isCompleted: false,
                 remindMe: false, priority: Strings.Blue
             ),
-            inSection: SectionModel(
-                sectionTitle: "Section2",
-                sectionItems: [
-                    TaskModel(
-                        title: "Item4",
-                        description: "desc4",
-                        startingTime: nil,
-                        isCompleted: false,
-                        remindMe: false, priority: Strings.Blue
-                    ),
-                ]
-            ),
-            inBoard: Board(
-                boardName: "BoardTestname",
-                boardImage: "testImage"
-            )
+            inSection: NewSection(id: "", sectionTitle: ""),
+            boardID: ""
         )
     }
-    .environmentObject(ListViewModel())
+    .environmentObject(AppViewModel())
 }

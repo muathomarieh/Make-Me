@@ -16,6 +16,7 @@ struct TaskModel: Identifiable, Codable, Hashable {
     let isCompleted: Bool
     let remindMe: Bool
     let priority: String?
+    //let order: Int
     
     init(id: String = UUID().uuidString, title: String, description: String, startingTime: Date?,isCompleted: Bool, remindMe: Bool, priority: String? = nil) {
         self.id = id
@@ -34,4 +35,17 @@ struct TaskModel: Identifiable, Codable, Hashable {
     func updateItemContent(newTitle: String, newDescription: String, newStartingTime: Date?, newRemindMeState: Bool, newPriority: String?) -> TaskModel {
         return TaskModel(id: id, title: newTitle, description: newDescription, startingTime: newStartingTime ?? startingTime, isCompleted: isCompleted, remindMe: newRemindMeState, priority: newPriority)
     }
+    
+//    func withUpdatedOrder(newOrder: Int) -> TaskModel {
+//            return TaskModel(
+//                id: id,
+//                title: title,
+//                description: description,
+//                startingTime: startingTime,
+//                isCompleted: isCompleted,
+//                remindMe: remindMe,
+//                priority: priority,
+//                order: newOrder
+//            )
+//        }
 }

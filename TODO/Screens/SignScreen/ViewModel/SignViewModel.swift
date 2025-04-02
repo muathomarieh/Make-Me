@@ -14,6 +14,7 @@ struct GoogleSignInResultModel {
     let idToken: String
     let accessToken: String
     let name: String
+    let email: String
 }
 
 final class SignViewModel: ObservableObject {
@@ -21,20 +22,21 @@ final class SignViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var name: String = ""
+    @Published var image: String = "testImage"
     
     func signUp() async throws {
         guard !email.isEmpty, !password.isEmpty else {
             print("No Email or password found.")
-            return
+            throw TODOErrors.failedToSignUp
         }
         
-        try await AuthenticationManager.shared.createUser(email: email, password: password, name: name)
+        try await AuthenticationManager.shared.createUser(email: email, password: password, name: name ,image: image)
     }
     
     func signIn() async throws {
         guard !email.isEmpty, !password.isEmpty else {
             print("No Email or password found.")
-            return
+            throw TODOErrors.failedToSignIn
         }
         
         try await AuthenticationManager.shared.signInUser(email: email, password: password)
@@ -57,7 +59,8 @@ final class SignViewModel: ObservableObject {
         }
         
         let accessToken: String = gidSignInResult.user.accessToken.tokenString
-        let tokens = GoogleSignInResultModel(idToken: idToken, accessToken: accessToken, name: userName ?? userGivenName ?? "Anonymous")
+        let userEmail = gidSignInResult.user.profile?.email
+        let tokens = GoogleSignInResultModel(idToken: idToken, accessToken: accessToken, name: userName ?? userGivenName ?? "Anonymous", email: userEmail!)
         try await AuthenticationManager.shared.signInWithGoogle(tokens: tokens)
     }
 }

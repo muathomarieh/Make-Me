@@ -11,6 +11,7 @@ struct CreateNewBoardView: View {
     
     @Environment(\.dismiss) var dismiss
     
+    @EnvironmentObject var appViewModel: AppViewModel
     @State var textFieldText: String = ""
     @State var pickedImage: String = "testImage"
     @State var pickedImageIndex: Int = 0   // remove when get the images
@@ -47,8 +48,7 @@ struct CreateNewBoardView: View {
             .scrollIndicators(.hidden)
             AppButton(buttonTitle: "New Board") {
                 do {
-                    let user = try AuthenticationManager.shared.getAuthenticatedUser()
-                    try BoardsManager.shared.addBoard(boardName: textFieldText, boardImage: pickedImage, userID: user.uid)
+                    try appViewModel.addBoard(boardName: textFieldText, boardImage: pickedImage)
                 } catch {
                     print(error)
                 }

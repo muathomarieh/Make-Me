@@ -10,17 +10,20 @@ import SwiftUI
 struct TextFieldView: View {
     let placeHolder: String
     @Binding var textFieldText: String
+    
+    var placeholderColor: Color = .gray
+    var textColor: Color = .black
     var body: some View {
-        TextField(placeHolder, text: $textFieldText)
-            .frame(height: 55)
-            .padding(.horizontal)
-            .background(Color.appGray)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+        TextField("", text: $textFieldText, prompt: Text(placeHolder).foregroundColor(placeholderColor))
+                   .frame(height: 55)
+                   .padding(.horizontal)
+                   .background(Color.appGray)
+                   .clipShape(RoundedRectangle(cornerRadius: 10))
+                   .tint(textColor)
+                   .foregroundColor(textColor)
     }
 }
 
 #Preview {
-    @Previewable
-    @State var textFieldText: String = ""
-    TextFieldView(placeHolder: "Section Title..." ,textFieldText: $textFieldText)
+    TextFieldView(placeHolder: "Section Title..." ,textFieldText: .constant(""))
 }

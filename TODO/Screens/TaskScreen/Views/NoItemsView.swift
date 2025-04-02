@@ -11,6 +11,7 @@ struct NoItemsView: View {
     
     let inBoard: NewBoard
     @State var animate: Bool = false
+    @State var showAddBoardColor: Bool = false
     let maroonColor = Color("MaroonColor")
     
     var body: some View {
@@ -26,8 +27,8 @@ struct NoItemsView: View {
                 "Are you productive person? I think you should click the add button and add a bunch of tasks to your todo list!"
             )
             .padding(.bottom, 20)
-            NavigationLink {
-                AddSectionView(inBoard: inBoard)
+            Button {
+                showAddBoardColor.toggle()
             } label: {
                 Text("Add Something 🥳")
                     .foregroundStyle(.white)
@@ -54,6 +55,11 @@ struct NoItemsView: View {
             Spacer()
                 
         }
+        .sheet(isPresented: $showAddBoardColor, content: {
+            AddSectionView(board: inBoard)
+                .padding(.top, 20)
+                .presentationDetents([.medium])
+        })
         .frame(maxWidth: 400, maxHeight: .infinity)
         .multilineTextAlignment(.center)
         .padding(40)

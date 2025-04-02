@@ -380,35 +380,187 @@ import Combine
 //    }
 //}
 
-
-class ListViewModel: ObservableObject {
+class AppViewModel: ObservableObject {
     
-    @Published var boards: [Board] = []
     @Published var user: NewUserModel? = nil
-    @Published var manager = BoardsManager.shared
-    @Published var text = ""
+    
+    @Published var friendRequests: [FriendRequest] = []
+    @Published var boardInvites: [FriendBoardInvite] = []
+    
+    @Published var friends: [NewUserModel] = []
     @Published var cancellable = Set<AnyCancellable>()
+    @Published var addFriendEmail = ""
+    
+    @Published var yourBoards: [NewBoard] = []
+    @Published var haveAccessboards: [NewBoard] = []
+    
     
     init() {
-        //getBoards()
-       
+        getYourBoards()
+        getBoardsYouHaveAccessToo()
+        do {
+            try userData()
+            try fetchFriendRequests()
+            try fetchBoardsInvites()
+            print("init fatchFriends")
+        } catch {
+            print("Failed to get the user: \(error)")
+        }
     }
     
     // FireStore
     func userData() throws {
-        
         let user = try AuthenticationManager.shared.getAuthenticatedUser()
+        
         FirebaseFirestore.shared.getUserData(userID: user.uid)
             .receive(on: DispatchQueue.main)
             .sink { error in
-                
+                print("Error fetching user data: \(error)")
             } receiveValue: { [weak self] user in
                 self?.user = user
+                
+                // 🔹 Fetch friends only after user is set
+                guard !user.friends.isEmpty else {
+                    print("No friends to fetch")
+                    return
+                }
+                
+                FirebaseFirestore.shared.getUsersFromIDs(user.friends)
+                    .receive(on: DispatchQueue.main)
+                    .sink { error in
+                        print("Error fetching friends: \(error)")
+                    } receiveValue: { [weak self] friends in
+                        self?.friends = friends
+                    }
+                    .store(in: &self!.cancellable)
             }
             .store(in: &cancellable)
-
     }
     
+    func getYourBoards() {
+        print("getBoards")
+        do {
+            let user = try AuthenticationManager.shared.getAuthenticatedUser()
+            FirebaseFirestore.shared.fetchYourBoards(userId: user.uid)
+                .sink { _ in
+                    
+                } receiveValue: { [weak self] boards in
+                    self?.yourBoards = boards
+                }
+                .store(in: &cancellable)
+            
+        } catch {
+            print("Failed to get the user id in getBoards.")
+        }
+    }
+    
+    func getBoardsYouHaveAccessToo() {
+        print("getBoards")
+        do {
+            let user = try AuthenticationManager.shared.getAuthenticatedUser()
+            FirebaseFirestore.shared.fetchBoardsYouHaveAccesse(userId: user.uid)
+                .sink { _ in
+                    
+                } receiveValue: { [weak self] boards in
+                    self?.haveAccessboards = boards
+                    print("haveAccessboards: \(boards)------------------------------------------------------")
+                }
+                .store(in: &cancellable)
+            
+        } catch {
+            print("Failed to get the user id in getBoards.")
+        }
+    }
+    
+    func deleteBoard(boardID: String) {
+        do {
+            let user = try AuthenticationManager.shared.getAuthenticatedUser()
+            FirebaseFirestore.shared.deleteBoard(boardID: boardID, userID: user.uid)
+        } catch {
+            print(print("Failed to get the user id in deleteBoard."))
+        }
+    }
+    
+    func updateBoardFavoriteState(boardID: String, state: Bool) {
+        FirebaseFirestore.shared.updateBoardFavoriteState(boardID: boardID, state: state)
+    }
+    
+    func fetchFriendRequests()  throws {
+        print("fetchFriendRequests")
+        let user = try AuthenticationManager.shared.getAuthenticatedUser()
+        print("fetchFriendRequests")
+        FirebaseFirestore.shared.fetchFriendRequests(userID: user.uid)
+            .sink(receiveCompletion: { _ in
+                
+            }, receiveValue: { [weak self] requests in
+                self?.friendRequests = requests
+            })
+            .store(in: &cancellable)
+        
+    }
+    
+    func friendRequest() throws {
+        guard let sender = user else { return }
+        Task {
+            await FirebaseFirestore.shared
+                .friendRequest(email: addFriendEmail, sender: sender)
+        }
+    }
+    
+    func friendRequestAccept(request: FriendRequest) {
+        FirebaseFirestore.shared.friendRequestAccept(request: request)
+    }
+    
+    func friendRequestReject(request: FriendRequest) {
+        FirebaseFirestore.shared.friendRequestReject(request: request)
+    }
+    
+    // boards invites
+    func fetchBoardsInvites() throws {
+        print("fetchBoardsInvites")
+        let user = try AuthenticationManager.shared.getAuthenticatedUser()
+        print("fetchBoardsInvites")
+        FirebaseFirestore.shared.fetchBoardsInvites(userID: user.uid)
+            .sink(receiveCompletion: { _ in
+                
+            }, receiveValue: { [weak self] invites in
+                print("Invites::::: \(invites)")
+                self?.boardInvites = invites
+            })
+            .store(in: &cancellable)
+        
+    }
+    
+    func inviteFriendToBoard(reciever: NewUserModel, boardID: String) throws {
+        guard let sender = user else { return }
+        Task {
+            await FirebaseFirestore.shared
+                .inviteFriendToBoard(reciever: reciever, sender: sender, boardID: boardID)
+        }
+    }
+    
+    func boardsInviteAccept(invite: FriendBoardInvite) {
+        FirebaseFirestore.shared.boardsInviteAccept(invite: invite)
+    }
+    
+    func boardsInviteReject(invite: FriendBoardInvite) {
+        FirebaseFirestore.shared.boardsInviteReject(invite: invite)
+    }
+    
+    var notificationsCount: Int {
+        friendRequests.count + boardInvites.count
+    }
+    
+    
+    func addBoard(boardName: String, boardImage: String) throws {
+        let userAuthenticated = try AuthenticationManager.shared.getAuthenticatedUser()
+        let newBoard = if let image = user?.image {
+             NewBoard(boardName: boardName, boardImage: "testImage", creatorId: userAuthenticated.uid, boardUsers: [userAuthenticated.uid], boardUsersImages: [image])
+        } else {
+             NewBoard(boardName: boardName, boardImage: "testImage", creatorId: userAuthenticated.uid, boardUsers: [userAuthenticated.uid])
+        }
+        try FirebaseFirestore.shared.addBoard(board: newBoard)
+    }
     
 //    func getBoards() {
 //        
@@ -422,16 +574,16 @@ class ListViewModel: ObservableObject {
 //            .store(in: &cancellable)
 //    }
     
-    private func filterBoards(text: String, boards: [Board]) -> [Board] {
-        guard !text.isEmpty else {
-            return boards
-        }
-        
-        let lowercassedText = text.lowercased()
-        return boards.filter { board -> Bool in
-            return board.boardName.lowercased().contains(lowercassedText)
-        }
-    }
+//    private func filterBoards(text: String, boards: [Board]) -> [Board] {
+//        guard !text.isEmpty else {
+//            return boards
+//        }
+//        
+//        let lowercassedText = text.lowercased()
+//        return boards.filter { board -> Bool in
+//         //   return board.boardName.lowercased().contains(lowercassedText)
+//        }
+//    }
     
 //    // MARK: ADDING PART
 //    func addBoard(boardName: String, boardImage: String) throws {

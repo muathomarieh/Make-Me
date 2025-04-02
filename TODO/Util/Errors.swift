@@ -9,6 +9,8 @@ import Foundation
 
 enum TODOErrors: LocalizedError {
     case invalidAuthenticatedUser
+    case failedToSignUp
+    case failedToSignIn
     case topVC
     case invalidInput(reason: String)
 
@@ -20,6 +22,10 @@ enum TODOErrors: LocalizedError {
             return "TopVC error."
         case .invalidInput(let reason):
             return "Invalid input: \(reason)"
+        case .failedToSignUp:
+            return "Failed to sign up."
+        case .failedToSignIn:
+            return "Failed to signIn."
         }
     }
 }

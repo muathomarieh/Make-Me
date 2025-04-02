@@ -7,16 +7,14 @@
 
 import SwiftUI
 
-struct BoardCardView: View {
+struct BoardAccessedCardView: View {
     
     let boardName: String
     let imageName: String
     let isFavorite: Bool
     let boardUsersImages: [String]
-    
-    
+
     let favoriteClicked: () -> Void
-    let plusClicked: () -> Void
     
     var body: some View {
         ZStack {
@@ -53,18 +51,6 @@ struct BoardCardView: View {
                 .onTapGesture {
                     favoriteClicked()
                 }
-            
-            Image(systemName: "plus")
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
-                .onTapGesture {
-                    plusClicked()
-                }
-                .frame(maxWidth: .infinity,
-                       maxHeight: .infinity,
-                       alignment: .topTrailing)
-                .padding()
                 
             ScrollView(.horizontal, content: {
                 
@@ -92,9 +78,7 @@ struct BoardCardView: View {
 }
 
 #Preview {
-    BoardCardView(boardName: "TEST_BOARD_NAME", imageName: "testImage", isFavorite: true, boardUsersImages: []) {
+    BoardAccessedCardView(boardName: "TEST_BOARD_NAME", imageName: "testImage", isFavorite: true, boardUsersImages: []) {
         
-    } plusClicked: {
-        
-    }
+    } 
 }

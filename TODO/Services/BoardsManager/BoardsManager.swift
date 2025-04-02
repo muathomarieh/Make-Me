@@ -225,16 +225,16 @@ class BoardsManager {
     
     static let shared = BoardsManager()
     // MARK: ADDING PART
-    func addBoard(boardName: String, boardImage: String, userID: String) throws {
-        let newBoard = NewBoard(boardName: boardName, boardImage: "testImage", creatorId: userID)
-        try FirebaseFirestore.shared.addBoard(board: newBoard, userID: userID)
-    }
-    
-    func addSection(title: String, for boardID: String) throws {
-        let newSection = NewSection(sectionTitle: title)
-        try FirebaseFirestore.shared
-            .addSection(section: newSection, boardID: boardID)
-    }
+//    func addBoard(boardName: String, boardImage: String, userID: String) throws {
+//        let newBoard = NewBoard(boardName: boardName, boardImage: "testImage", creatorId: userID)
+//        try FirebaseFirestore.shared.addBoard(board: newBoard, userID: userID)
+//    }
+//    
+//    func addSection(title: String, for boardID: String) throws {
+//        let newSection = NewSection(sectionTitle: title)
+//        try FirebaseFirestore.shared
+//            .addSection(section: newSection, boardID: boardID)
+//    }
     
     func addItem(
         task: TaskModel,
@@ -250,7 +250,7 @@ class BoardsManager {
             }
         }
         print(id)
-        try FirebaseFirestore.shared.addTask(task: task, section: section, boardID: boardID)
+        try FirebaseFirestore.shared.addTask(task: task, sectionID: section.id, boardID: boardID)
         
     }
     

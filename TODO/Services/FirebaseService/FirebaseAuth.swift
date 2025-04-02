@@ -21,9 +21,9 @@ final class AuthenticationManager {
         return user
     }
     
-    func createUser(email: String, password: String, name: String) async throws {
+    func createUser(email: String, password: String, name: String, image: String) async throws {
         let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
-        try await FirebaseFirestore.shared.addUser(user: NewUserModel(id: authDataResult.user.uid, name: name))
+        try await FirebaseFirestore.shared.addUser(user: NewUserModel(id: authDataResult.user.uid, name: name, email: email, image: image))
 
     }
     
@@ -44,12 +44,12 @@ extension AuthenticationManager {
     func signInWithGoogle(tokens: GoogleSignInResultModel) async throws {
         let credential = GoogleAuthProvider.credential(withIDToken: tokens.idToken,
                                                        accessToken: tokens.accessToken)
-        try await signIn(credential: credential, name: tokens.name)
+        try await signIn(credential: credential, name: tokens.name, email: tokens.email, image: "testImage")
     }
     
-    func signIn(credential: AuthCredential, name: String) async throws {
+    func signIn(credential: AuthCredential, name: String, email: String, image: String) async throws {
         let authDataResult = try await Auth.auth().signIn(with: credential)
-        try await FirebaseFirestore.shared.addUser(user: NewUserModel(id: authDataResult.user.uid, name: name))
+        try await FirebaseFirestore.shared.addUser(user: NewUserModel(id: authDataResult.user.uid, name: name, email: email, image: image))
         print(authDataResult.user.uid)
         print(name)
     }

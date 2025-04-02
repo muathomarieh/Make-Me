@@ -20,8 +20,6 @@ struct FriendRowView: View {
                 .font(.headline)
                 .foregroundStyle(.white)
             Spacer()
-            Image(systemName: "plus")
-                .foregroundStyle(.white)
         }
         .frame(height: 70)
            
@@ -29,5 +27,5 @@ struct FriendRowView: View {
 }
 
 #Preview {
-    FriendRowView(image: "testImage", name: "Muath Omarieh")
+    FriendRowView(image: "testImage", name: "Muath Omarieh") 
 }

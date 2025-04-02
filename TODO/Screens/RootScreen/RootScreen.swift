@@ -9,14 +9,14 @@ import SwiftUI
 
 struct RootScreen: View {
     
-    @StateObject var listViewModel: ListViewModel = ListViewModel()
+    @StateObject var listViewModel: AppViewModel = AppViewModel()
     @State var showSignScreen: Bool = false
     
     var body: some View {
         ZStack {
             if !showSignScreen {
                 NavigationStack {
-                    MainView()
+                    MainView(showSignScreen: $showSignScreen)
                 }
                 .environmentObject(listViewModel)
             }

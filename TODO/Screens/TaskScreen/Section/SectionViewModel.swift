@@ -11,6 +11,7 @@ import Combine
 class SectionViewModel: ObservableObject {
     
     @Published var sections: [NewSection] = []
+    @Published var friendRequests: [FriendRequest] = []
     @Published var boardID: String? = nil
     var cancellable = Set<AnyCancellable>()
     
@@ -32,7 +33,11 @@ class SectionViewModel: ObservableObject {
                 print(sections)
             }
             .store(in: &cancellable)
-
     }
     
+    func addSection(title: String, for boardID: String) throws {
+        let newSection = NewSection(sectionTitle: title)
+        try FirebaseFirestore.shared
+            .addSection(section: newSection, boardID: boardID)
+    }
 }

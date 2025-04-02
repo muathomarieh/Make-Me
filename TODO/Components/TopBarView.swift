@@ -9,9 +9,15 @@ import SwiftUI
 
 struct TopBarView: View {
     
+    @Binding var showSignScreen: Bool
+    @Binding var showFriendRequests: Bool
+    var badgeValue: Int
     let barType: TopBarType
     let title: String
     let image: String
+    
+    @State var selectedProfileImage: Int = 0
+    @State var showProfileImageSheet: Bool = false
     
     var body: some View {
         ZStack {
@@ -26,26 +32,42 @@ struct TopBarView: View {
                 }
                 
                 if barType == .friends {
-                    Menu {
-                        Button("Open in Preview") {
-                            
-                        }
-                    } label: {
                         Image(systemName: "text.justify")
                             .resizable()
+                            .foregroundStyle(.black)
                             .frame(width: 30, height: 30)
-                    }
-//                    Image(systemName: "text.justify")
-//                        .resizable()
-//                        .frame(width: 30, height: 30)
-//                        .onTapGesture {
-//                            Menu
-//                        }
+                            .onTapGesture {
+                                showFriendRequests.toggle()
+                            }
+                            .overlay {
+                                NotificationCountView(value: badgeValue)
+                            }
+                        
                 }
                 Spacer()
-                ProfileImageView(image: image)
+                if barType == .friends {
+                    Menu {
+                        Button("LogOut") {
+                            do {
+                                try AuthenticationManager.shared.signOut()
+                                showSignScreen = true
+                            } catch {
+                                print(error)
+                            }
+                        }
+                        Button("Change profile image.") {
+                            showProfileImageSheet.toggle()
+                        }
+                    } label: {
+                        ProfileImageView(image: image)
+                    }
+                } else {
+                    ProfileImageView(image: image)
+                }
             }
-            //.padding()
+            .sheet(isPresented: $showProfileImageSheet) {
+                ProfileImagePickerView(selectedProfileImage: $selectedProfileImage, showSheet: $showProfileImageSheet, profileImagePickerViewType: .updating)
+            }
             .padding(.top, 30)
             .padding(.horizontal, 20)
         }
@@ -59,6 +81,6 @@ enum TopBarType {
 }
 
 #Preview {
-    TopBarView(barType: .friends, title: "Boards", image: "testImage")
+    TopBarView(showSignScreen: .constant(false), showFriendRequests: .constant(false), badgeValue: 0, barType: .friends, title: "Boards", image: "testImage")
         .background(.red)
 }

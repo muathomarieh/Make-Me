@@ -9,13 +9,15 @@ import SwiftUI
 
 struct BoardsView: View {
     
-    @StateObject var vm: BoardsViewModel = BoardsViewModel()
+    @EnvironmentObject var appViewModel: AppViewModel
+    //@StateObject var appViewModel: BoardsViewModel = BoardsViewModel()
     
     @State var text: String = ""
     @State var isFavorite: Bool = true
     @State var showListSectionView: Bool = false
     @State var showAddBoardView: Bool = false
     @State var selectedBoard: NewBoard? = nil
+    @State var selectedBoardToAddUserTo: NewBoard? = nil
     
     var body: some View {
         ZStack {
@@ -26,7 +28,7 @@ struct BoardsView: View {
             )
             .ignoresSafeArea()
             VStack(spacing: 0) {
-                TopBarView(barType: .boards, title: "BOARDS", image: "testImage")
+                TopBarView(showSignScreen: .constant(false), showFriendRequests: .constant(false), badgeValue: 0, barType: .boards, title: "BOARDS", image: appViewModel.user?.image ?? "testImage")
                     .ignoresSafeArea(.container, edges: .top)
                     
                 VStack {
@@ -38,33 +40,44 @@ struct BoardsView: View {
                     
                     ScrollView {
                         VStack(spacing: 20) {
-                            LabelledDivider(label: "Yours", color: .white)
-                            ForEach(vm.yourBoards) { board in
+                            if !appViewModel.yourBoards.isEmpty {
+                                LabelledDivider(label: "Yours", color: .white)
+                            }
+                            ForEach(appViewModel.yourBoards) { board in
                                 BoardCardView(
                                     boardName: board.boardName,
                                     imageName: board.boardImage,
-                                    isFavorite: board.isFavorite
+                                    isFavorite: board.isFavorite,
+                                    boardUsersImages: board.boardUsersImages
                                 ) {
-                                    vm.updateBoardFavoriteState(boardID: board.id, state: board.isFavorite)
+                                    appViewModel.updateBoardFavoriteState(boardID: board.id, state: board.isFavorite)
+                                } plusClicked: {
+                                    selectedBoardToAddUserTo = board
                                 }
                                 .onTapGesture {
                                     selectedBoard = board
                                     showListSectionView = true
                                 }
                                 .contextMenu {
-                                    
-                                    Text("delete board")
+                                    Button(role: .destructive) {
+                                        appViewModel.deleteBoard(boardID: board.id)
+                                        } label: {
+                                            Text("Delete board.")
+                                                .fontWeight(.bold)
+                                        }
                                 }
                             }
-                            LabelledDivider(label: "YouJoined", color: .white)
-                            ForEach(vm.haveAccessboards) { board in
-                                BoardCardView(
+                            if !appViewModel.haveAccessboards.isEmpty {
+                                LabelledDivider(label: "YouJoined", color: .white)
+                            }
+                            ForEach(appViewModel.haveAccessboards) { board in
+                                BoardAccessedCardView(
                                     boardName: board.boardName,
                                     imageName: board.boardImage,
-                                    isFavorite: board.isFavorite
+                                    isFavorite: board.isFavorite, boardUsersImages: board.boardUsersImages
                                 ) {
-                                    vm.updateBoardFavoriteState(boardID: board.id, state: board.isFavorite)
-                                }
+                                    appViewModel.updateBoardFavoriteState(boardID: board.id, state: board.isFavorite)
+                                } 
                                 .onTapGesture {
                                     selectedBoard = board
                                     showListSectionView = true
@@ -74,6 +87,10 @@ struct BoardsView: View {
                         .padding(.bottom, 20)
                     }
                     .scrollIndicators(.hidden)
+                }
+                .sheet(item: $selectedBoardToAddUserTo) { board in
+                    boardInvitesView(board: board)
+                        .presentationDetents([.height(150)])
                 }
                 .padding(.horizontal)
                     
@@ -97,7 +114,48 @@ struct BoardsView: View {
 }
 
 
+extension BoardsView {
+    func boardInvitesView(board: NewBoard) -> some View {
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: Color.theme.accentToWhite),
+                startPoint: .bottomTrailing,
+                endPoint: .topLeading
+            ).ignoresSafeArea()
+            
+            if !appViewModel.friends.isEmpty {
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(appViewModel.friends) { friend in
+                            VStack {
+                                ProfileImageView(image: friend.image)
+                                Text(friend.name)
+                                    .foregroundStyle(.white)
+                            }
+                            .padding()
+                            .onTapGesture {
+                                do {
+                                    try appViewModel.inviteFriendToBoard(reciever: friend, boardID: board.id)
+                                    selectedBoardToAddUserTo = nil
+                                } catch {
+                                    print("inviteFriendToBoard Failed: \(error)")
+                                }
+                            }
+                            .padding()
+                        }
+                    }
+                }
+            } else {
+                Text("No friends to invite.").font(.headline)
+                    .foregroundStyle(.white)
+            }
+        }
+    }
+}
+
 #Preview {
-    BoardsView()
-        .environmentObject(ListViewModel())
+    NavigationStack {
+        BoardsView()
+            .environmentObject(AppViewModel())
+    }
 }
