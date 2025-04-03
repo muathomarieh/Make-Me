@@ -99,7 +99,7 @@ extension AddTask {
             do {
                 try BoardsManager.shared
                     .addItem(task:
-                                TaskModel(title: textFieldText, description: textEditorText, startingTime: showTimePicker ? pickerSelection : nil, isCompleted: false, remindMe: remindMe, priority: priority),
+                                TaskModel(title: textFieldText, description: textEditorText, startingTime: showTimePicker ? pickerSelection : nil, isCompleted: false, remindMe: remindMe, priority: priority, order: 0),
                              forSection: section,
                              forBoard: inBoard.id)
             } catch {

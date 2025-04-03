@@ -127,7 +127,7 @@ extension FriendsView {
                                 BoardInviteRow(
                                     image: invite.sender.image,
                                     name: invite.sender.name,
-                                    boardName: "") {
+                                    boardName: invite.boardName) {
                                         appViewModel
                                             .boardsInviteAccept(invite: invite)
                                     } rejected: {

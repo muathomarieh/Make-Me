@@ -52,7 +52,6 @@ final class FirebaseFirestore {
     }
     
     func addBoard(board: NewBoard) throws {
-        print("addBoard in firestore: \(board)")
         try db
             .collection(Collections.boards.rawValue)
             .document(board.id)
@@ -60,8 +59,6 @@ final class FirebaseFirestore {
     }
     
     func addSection(section: NewSection, boardID: String) throws {
-        print("addSection in Firestore: \(section), boardIndex: \(boardID)")
-            
         try sectionCollection(boardID: boardID)
             .document(section.id)
             .setData(from: section, encoder: encoder)
@@ -69,6 +66,7 @@ final class FirebaseFirestore {
     
     
     func addTask(task: TaskModel, sectionID: String, boardID: String) throws {
+        print("addTask:::\(task)")
         try taskCollection(boardID: boardID, sectionID: sectionID)
             .document(task.id)
             .setData(from: task, encoder: encoder)
@@ -135,7 +133,6 @@ final class FirebaseFirestore {
                 }
                 do {
                     let user = try document.data(as: NewUserModel.self)
-                    print("user: \(user)")
                     publisher.send(user)
                 } catch {
                     print(error)
@@ -145,26 +142,24 @@ final class FirebaseFirestore {
         return publisher.eraseToAnyPublisher()
     }
     
-    func fetchYourBoards(userId: String) -> AnyPublisher<[NewBoard], Error> {
-        let publisher = PassthroughSubject<[NewBoard], Error>()
+    func fetchYourBoards(userId: String) -> AnyPublisher<[NewBoard], Never> {
+        let publisher = PassthroughSubject<[NewBoard], Never>()
         
         db.collection(Collections.boards.rawValue)
             .whereField("creator_id", isEqualTo: userId)
             .order(by: "date_created")
             .addSnapshotListener { snapshot, error in
                 let boards: [NewBoard] = snapshot?.documents.compactMap({ document in
-                    print("fetchYourBoards: \(document.documentID)")
                     return try? document
                         .data(as: NewBoard.self, decoder: self.decoder)
                 }) ?? []
                 publisher.send(boards)
-                print("boards: \(boards)")
             }
         return publisher.eraseToAnyPublisher()
     }
     
-    func fetchBoardsYouHaveAccesse(userId: String) -> AnyPublisher<[NewBoard], Error> {
-        let publisher = PassthroughSubject<[NewBoard], Error>()
+    func fetchBoardsYouHaveAccesse(userId: String) -> AnyPublisher<[NewBoard], Never> {
+        let publisher = PassthroughSubject<[NewBoard], Never>()
         
         db.collection(Collections.boards.rawValue)
             .whereField("creator_id", isNotEqualTo: userId)
@@ -172,11 +167,9 @@ final class FirebaseFirestore {
             .order(by: "date_created")
             .addSnapshotListener { snapshot, error in
                 let boards: [NewBoard] = snapshot?.documents.compactMap({ document in
-                    print("fetchBoardsYouHaveAccesse: \(document.documentID)")
                     return try? document.data(as: NewBoard.self, decoder: self.decoder)
                 }) ?? []
                 publisher.send(boards)
-                print("fetchBoardsYouHaveAccesse: \(boards)")
             }
         return publisher.eraseToAnyPublisher()
     }
@@ -187,12 +180,10 @@ final class FirebaseFirestore {
         sectionCollection(boardID: boardID)
             .addSnapshotListener { snapshot, error in
                 let sections: [NewSection] = snapshot?.documents.compactMap({ document in
-                    print("fetchSections: \(document.documentID)")
                     return try? document
                         .data(as: NewSection.self, decoder: self.decoder)
                 }) ?? []
                 publisher.send(sections)
-                print("sections: \(sections)")
             }
         return publisher.eraseToAnyPublisher()
     }
@@ -201,14 +192,13 @@ final class FirebaseFirestore {
         let publisher = PassthroughSubject<[TaskModel], Error>()
         
         taskCollection(boardID: boardID, sectionID: sectionID)
+            .order(by: "order")
             .addSnapshotListener { snapshot, error in
                 let boards: [TaskModel] = snapshot?.documents.compactMap({ document in
-                    print("fetchTasksToSection: \(document.documentID)")
                     return try? document
                         .data(as: TaskModel.self, decoder: self.decoder)
                 }) ?? []
                 publisher.send(boards)
-                print("boards: \(boards)")
             }
         return publisher.eraseToAnyPublisher()
     }
@@ -216,8 +206,6 @@ final class FirebaseFirestore {
     //friends
     func friendRequest(email: String, sender: NewUserModel) async -> String {
         do {
-            print("Searching for user with email: \(email)")
-            
             let document = try await db.collection(Collections.users.rawValue)
                 .whereField("email", isEqualTo: email)
                 .getDocuments()
@@ -227,14 +215,11 @@ final class FirebaseFirestore {
                 return "User not found. Check email."
             }
             
-            print("User found: \(reciever)")
-
             let friendRequestDocument = db.collection(Collections.friendRequests.rawValue)
                 .document()
             
             try friendRequestDocument.setData(from: FriendRequest(id: friendRequestDocument.documentID, sender: sender, reciever: reciever), encoder: encoder)
             
-            print("Friend request sent to: \(reciever.id)")
             return "Friend request sent!"
             
         } catch {
@@ -248,7 +233,6 @@ final class FirebaseFirestore {
         db.collection(Collections.friendRequests.rawValue).whereField("reciever.id", isEqualTo: userID)
             .addSnapshotListener { snapshot, error in
                 let requests: [FriendRequest] = snapshot?.documents.compactMap({ document in
-                    print("fetchFriendRequests: \(document.documentID)")
                     return try? document
                         .data(as: FriendRequest.self, decoder: self.decoder)
                     
@@ -277,7 +261,6 @@ final class FirebaseFirestore {
     }
     
     func getUsersFromIDs(_ friendIDs: [String]) ->  AnyPublisher<[NewUserModel], Error> {
-        print("getUsersFromIDs: \(friendIDs)")
         let publisher = PassthroughSubject<[NewUserModel], Error>()
         
         guard !friendIDs.isEmpty else {
@@ -297,7 +280,6 @@ final class FirebaseFirestore {
                 }
 
                 let friends: [NewUserModel] = documents.compactMap({ document in
-                    print("fetchFriendRequests: \(document.documentID)")
                     return try? document
                         .data(as: NewUserModel.self, decoder: self.decoder)
                 })
@@ -307,16 +289,14 @@ final class FirebaseFirestore {
     }
     
     //boardsInvites
-    func inviteFriendToBoard(reciever: NewUserModel, sender: NewUserModel, boardID: String) async -> String {
+    func inviteFriendToBoard(reciever: NewUserModel, sender: NewUserModel, boardID: String, boardName: String) async -> String {
         do {
-            print("User found: \(reciever)")
 
             let friendRequestDocument = db.collection(Collections.boardInvites.rawValue)
                 .document()
             
-            try friendRequestDocument.setData(from: FriendBoardInvite(id: friendRequestDocument.documentID, boardId: boardID, sender: sender, reciever: reciever), encoder: encoder)
+            try friendRequestDocument.setData(from: FriendBoardInvite(id: friendRequestDocument.documentID, boardId: boardID, boardName: boardName, sender: sender, reciever: reciever), encoder: encoder)
             
-            print("Friend request sent to: \(reciever.id)")
             return "Friend request sent!"
             
         } catch {
@@ -330,12 +310,10 @@ final class FirebaseFirestore {
         db.collection(Collections.boardInvites.rawValue).whereField("reciever.id", isEqualTo: userID)
             .addSnapshotListener { snapshot, error in
                 let invites: [FriendBoardInvite] = snapshot?.documents.compactMap({ document in
-                    print("fetchBoardsInvites: \(document.documentID)")
                     return try? document
                         .data(as: FriendBoardInvite.self, decoder: self.decoder)
                     
                 }) ?? []
-                print("Invites:: \(invites)")
                 publisher.send(invites)
             }
         return publisher.eraseToAnyPublisher()
@@ -354,6 +332,16 @@ final class FirebaseFirestore {
     func boardsInviteReject(invite: FriendBoardInvite) {
         db.collection(Collections.boardInvites.rawValue).document(invite.id)
             .delete()
+    }
+    
+    
+    
+    func updateTaskOrder(taskID: String, sectionID: String, boardID: String, newOrder: Int) {
+        taskCollection(boardID: boardID, sectionID: sectionID)
+            .document(taskID)
+            .updateData([
+                "order": newOrder
+            ])
     }
     
 }

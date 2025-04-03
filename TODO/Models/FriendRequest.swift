@@ -16,6 +16,7 @@ struct FriendRequest: Codable, Identifiable {
 struct FriendBoardInvite: Codable, Identifiable {
     let id: String
     let boardId: String
+    let boardName: String
     let sender: NewUserModel
     let reciever: NewUserModel
 }

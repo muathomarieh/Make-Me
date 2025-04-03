@@ -46,7 +46,7 @@ struct ListRowView: View {
 }
 
 #Preview {
-    let item1 = TaskModel(title: "Item4", description: "desc4", startingTime: Date(),isCompleted: false, remindMe: false, priority: Strings.Blue)
+    let item1 = TaskModel(title: "Item4", description: "desc4", startingTime: Date(),isCompleted: false, remindMe: false, priority: Strings.Blue, order: 1)
    
     ZStack {
         Color.blue

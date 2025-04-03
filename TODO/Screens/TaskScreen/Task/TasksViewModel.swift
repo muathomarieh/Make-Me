@@ -31,11 +31,7 @@ class TasksViewModel: ObservableObject {
                 
             } receiveValue: { [weak self] tasks in
                 self?.tasks = tasks
-                print(separator: "-")
                 self?.updateProgress()
-                print("progress: \(self?.progress)")
-                print("Tasksssss: \(tasks)")
-                print(separator: "-")
             }
             .store(in: &cancellable)
     }
@@ -51,7 +47,6 @@ class TasksViewModel: ObservableObject {
         guard let boardID = boardID, let sectionID = sectionID else {
             return
         }
-        let newOrder = tasks.count
         
         if let date = task.startingTime {
             if task.remindMe {
@@ -80,25 +75,26 @@ class TasksViewModel: ObservableObject {
         }
         FirebaseFirestore.shared.updateTask(sectionID: secID, boardID: boardID, task: task)
     }
-//    func handleMove(from source: IndexSet, to destination: Int, sectionID: String, boardID: String) {
-//        var reorderedTasks = tasks
-//        reorderedTasks.move(fromOffsets: source, toOffset: destination)
-//        
-//        // Update order values based on new positions
-//        for (index, task) in reorderedTasks.enumerated() {
-//            let updatedTask = task.withUpdatedOrder(newOrder: index)
-//            if updatedTask.order != task.order {
-//                FirebaseFirestore.shared.updateTaskOrder(
-//                    taskID: updatedTask.id,
-//                    sectionID: sectionID,
-//                    boardID: boardID,
-//                    newOrder: updatedTask.order
-//                )
-//            }
-//        }
-//        
-//        tasks = reorderedTasks // Optimistic UI update
-//    }
+    
+    func handleMove(from source: IndexSet, to destination: Int, sectionID: String, boardID: String) {
+        var reorderedTasks = tasks
+        reorderedTasks.move(fromOffsets: source, toOffset: destination)
+        
+        // Update order values based on new positions
+        for (index, task) in reorderedTasks.enumerated() {
+            let updatedTask = task.withUpdatedOrder(newOrder: index)
+            if updatedTask.order != task.order {
+                FirebaseFirestore.shared.updateTaskOrder(
+                    taskID: updatedTask.id,
+                    sectionID: sectionID,
+                    boardID: boardID,
+                    newOrder: updatedTask.order
+                )
+            }
+        }
+        
+        tasks = reorderedTasks
+    }
     
     private func updateProgress() {
         let completedTasks = tasks.filter { $0.isCompleted }.count

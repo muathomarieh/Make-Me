@@ -391,6 +391,7 @@ class AppViewModel: ObservableObject {
     @Published var cancellable = Set<AnyCancellable>()
     @Published var addFriendEmail = ""
     
+    @Published var searchText = ""
     @Published var yourBoards: [NewBoard] = []
     @Published var haveAccessboards: [NewBoard] = []
     
@@ -402,7 +403,6 @@ class AppViewModel: ObservableObject {
             try userData()
             try fetchFriendRequests()
             try fetchBoardsInvites()
-            print("init fatchFriends")
         } catch {
             print("Failed to get the user: \(error)")
         }
@@ -441,7 +441,10 @@ class AppViewModel: ObservableObject {
         print("getBoards")
         do {
             let user = try AuthenticationManager.shared.getAuthenticatedUser()
+            
             FirebaseFirestore.shared.fetchYourBoards(userId: user.uid)
+                .combineLatest($searchText)
+                .map(filterBoards)
                 .sink { _ in
                     
                 } receiveValue: { [weak self] boards in
@@ -459,11 +462,12 @@ class AppViewModel: ObservableObject {
         do {
             let user = try AuthenticationManager.shared.getAuthenticatedUser()
             FirebaseFirestore.shared.fetchBoardsYouHaveAccesse(userId: user.uid)
+                .combineLatest($searchText)
+                .map(filterBoards)
                 .sink { _ in
                     
                 } receiveValue: { [weak self] boards in
                     self?.haveAccessboards = boards
-                    print("haveAccessboards: \(boards)------------------------------------------------------")
                 }
                 .store(in: &cancellable)
             
@@ -486,9 +490,7 @@ class AppViewModel: ObservableObject {
     }
     
     func fetchFriendRequests()  throws {
-        print("fetchFriendRequests")
         let user = try AuthenticationManager.shared.getAuthenticatedUser()
-        print("fetchFriendRequests")
         FirebaseFirestore.shared.fetchFriendRequests(userID: user.uid)
             .sink(receiveCompletion: { _ in
                 
@@ -517,25 +519,22 @@ class AppViewModel: ObservableObject {
     
     // boards invites
     func fetchBoardsInvites() throws {
-        print("fetchBoardsInvites")
         let user = try AuthenticationManager.shared.getAuthenticatedUser()
-        print("fetchBoardsInvites")
         FirebaseFirestore.shared.fetchBoardsInvites(userID: user.uid)
             .sink(receiveCompletion: { _ in
                 
             }, receiveValue: { [weak self] invites in
-                print("Invites::::: \(invites)")
                 self?.boardInvites = invites
             })
             .store(in: &cancellable)
         
     }
     
-    func inviteFriendToBoard(reciever: NewUserModel, boardID: String) throws {
+    func inviteFriendToBoard(reciever: NewUserModel, board: NewBoard) throws {
         guard let sender = user else { return }
         Task {
             await FirebaseFirestore.shared
-                .inviteFriendToBoard(reciever: reciever, sender: sender, boardID: boardID)
+                .inviteFriendToBoard(reciever: reciever, sender: sender, boardID: board.id, boardName: board.boardName)
         }
     }
     
@@ -574,16 +573,19 @@ class AppViewModel: ObservableObject {
 //            .store(in: &cancellable)
 //    }
     
-//    private func filterBoards(text: String, boards: [Board]) -> [Board] {
-//        guard !text.isEmpty else {
-//            return boards
-//        }
-//        
-//        let lowercassedText = text.lowercased()
-//        return boards.filter { board -> Bool in
-//         //   return board.boardName.lowercased().contains(lowercassedText)
-//        }
-//    }
+    private func filterBoards(boards: [NewBoard], text: String) -> [NewBoard] {
+        guard !text.isEmpty else {
+            print("Returning all boards because searchText is empty.")
+            return boards
+        }
+        
+        let lowercasedText = text.lowercased()
+        let filtered = boards.filter { board in
+            let containsText = board.boardName.lowercased().contains(lowercasedText)
+            return containsText
+        }
+        return filtered
+    }
     
 //    // MARK: ADDING PART
 //    func addBoard(boardName: String, boardImage: String) throws {

@@ -39,7 +39,7 @@ struct SectionContent: View {
                 taskVM.deleteTask(sectionID: section.id, boardID: boardID, indexSet: indexSet)
             }
             .onMove { indexSet, destination in
-                //handleMove(indexSet, destination, for: section)
+                taskVM.handleMove(from: indexSet, to: destination, sectionID: section.id, boardID: boardID)
             }
             .sheet(item: $selectedTask) { selectedTask in
                     TaskView(

@@ -23,7 +23,7 @@ struct RootScreen: View {
         }
         .onAppear {
             do {
-                let authUserID = try AuthenticationManager.shared.getAuthenticatedUser()
+                let _ = try AuthenticationManager.shared.getAuthenticatedUser()
                 print(showSignScreen)
             } catch {
                 showSignScreen = true

@@ -106,7 +106,7 @@ extension TaskView {
     
     func updateButtonPressed() {
         if newTitleAppropriate() {
-            taskVM.updateTask(task: TaskModel(id: selectedTask.id, title: textFieldText, description: textEditorText, startingTime: showTimePicker ? pickerSelection : nil, isCompleted: selectedTask.isCompleted, remindMe: remindMe, priority: priority), secID: inSection.id)
+            taskVM.updateTask(task: TaskModel(id: selectedTask.id, title: textFieldText, description: textEditorText, startingTime: showTimePicker ? pickerSelection : nil, isCompleted: selectedTask.isCompleted, remindMe: remindMe, priority: priority, order: selectedTask.order), secID: inSection.id)
             dismiss()
         }
         
@@ -132,7 +132,7 @@ extension TaskView {
                 description: "desc4",
                 startingTime: nil,
                 isCompleted: false,
-                remindMe: false, priority: Strings.Blue
+                remindMe: false, priority: Strings.Blue, order: 1
             ),
             inSection: NewSection(id: "", sectionTitle: ""),
             boardID: ""
