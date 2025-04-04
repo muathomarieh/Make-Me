@@ -16,27 +16,29 @@ struct ListRowView: View {
     var body: some View {
         HStack {
             Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(Color.theme.fontColor)
                 .onTapGesture {
                     checkmarkClicked()
                 }
             Text(item.title)
+                .foregroundStyle(Color.theme.fontColor)
             
             Spacer()
             
             if let startingTime = item.startingTime {
                 RoundedRectangle(cornerRadius: 6)
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(Color.theme.fontColor)
                     .frame(width: 60, height: 35)
                     .overlay {
                         HStack {
                             Text(startingTime.formattedTime)
                                 .font(.caption)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Color.theme.fontColor)
                         }
                     }
             }
             Image(systemName: "chevron.forward")
+                .foregroundStyle(Color.theme.fontColor)
                 .padding(.trailing)
             
         }

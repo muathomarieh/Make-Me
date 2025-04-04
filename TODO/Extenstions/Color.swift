@@ -17,6 +17,7 @@ struct Theme {
     let accentToWhite = [Color.accentColor, .white]
     let whiteToAccent = [.white, Color.accentColor]
     let appGray = Color("AppGray")
+    let fontColor = Color("FontColor")
 }
 
 struct Priority {

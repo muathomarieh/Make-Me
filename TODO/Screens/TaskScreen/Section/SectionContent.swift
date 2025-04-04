@@ -13,10 +13,9 @@ struct SectionContent: View {
     let boardID: String
     let onProgressChange: (CGFloat) -> Void
 
+    @State var selectedTask: TaskModel? = nil
     @StateObject var taskVM: TasksViewModel
-    
-    @State private var selectedTask: TaskModel?
-    
+        
     init(section: NewSection, boardID: String, progress: @escaping (CGFloat) -> Void) {
         self.section = section
         self.boardID = boardID
@@ -25,7 +24,8 @@ struct SectionContent: View {
     }
 
     var body: some View {
-        ForEach(taskVM.tasks) { task in
+        VStack {
+            ForEach(taskVM.tasks) { task in
                 taskRow(for: task, in: section)
                     .swipeActions(edge: .leading, allowsFullSwipe: true) {
                         Button("Check") {
@@ -41,19 +41,20 @@ struct SectionContent: View {
             .onMove { indexSet, destination in
                 taskVM.handleMove(from: indexSet, to: destination, sectionID: section.id, boardID: boardID)
             }
-            .sheet(item: $selectedTask) { selectedTask in
-                    TaskView(
-                        selectedTask: selectedTask,
-                        inSection: section,
-                        boardID: boardID
-                    ).environmentObject(taskVM)
-            }
             .onAppear {
                 onProgressChange(taskVM.progress)
             }
             .onChange(of: taskVM.progress) { oldValue, newValue in
                 onProgressChange(newValue)
             }
+        }
+        .sheet(item: $selectedTask, content: { task in
+            TaskView(
+                selectedTask: task,
+                inSection: section,
+                boardID: boardID
+            ).environmentObject(taskVM)
+        })
     }
     
     private func taskRow(for task: TaskModel, in section: NewSection) -> some View {

@@ -60,7 +60,7 @@ struct ListSectionView: View {
                         ForEach(sectionsVM.sections) { section in
                             Section {
                                 SectionContent(section: section, boardID: board.id) { progress in
-                                    sectionProgress[section.id] = progress // Update progress state
+                                    sectionProgress[section.id] = progress
                                 }
                                 addTaskToSection(for: section)
                             } header: {
@@ -73,7 +73,6 @@ struct ListSectionView: View {
                                     )
                                 )
                             }
-                            .listRowBackground(Color.white)
                         }
                     }
                     .listStyle(.automatic)
