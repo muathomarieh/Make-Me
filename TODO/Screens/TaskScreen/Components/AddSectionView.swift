@@ -18,7 +18,7 @@ struct AddSectionView: View {
     @StateObject var sectionsVM: SectionViewModel
     init(board: NewBoard) {
         self.inBoard = board
-        _sectionsVM = StateObject(wrappedValue: SectionViewModel(boardID: board.id))
+        _sectionsVM = StateObject(wrappedValue: SectionViewModel(boardID: board.id, boardUsersIDs: board.boardUsers))
     }
     
     var body: some View {

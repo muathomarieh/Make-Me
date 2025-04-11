@@ -29,16 +29,7 @@ struct TaskModel: Identifiable, Codable, Hashable {
         self.order = order
     }
     
-//    func updateCompletion() -> TaskModel {
-//        return TaskModel(id: id, title: title, description: description, startingTime: startingTime, isCompleted: !isCompleted, remindMe: remindMe, priority: priority)
-//    }
-//    
-//    func updateItemContent(newTitle: String, newDescription: String, newStartingTime: Date?, newRemindMeState: Bool, newPriority: String?) -> TaskModel {
-//        return TaskModel(id: id, title: newTitle, description: newDescription, startingTime: newStartingTime ?? startingTime, isCompleted: isCompleted, remindMe: newRemindMeState, priority: newPriority)
-//    }
-    
     func withUpdatedOrder(newOrder: Int) -> TaskModel {
-        print("newOrder-|||||-||||||\(newOrder)")
             return TaskModel(
                 id: id,
                 title: title,

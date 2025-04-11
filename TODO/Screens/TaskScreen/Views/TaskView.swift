@@ -132,7 +132,7 @@ extension TaskView {
                 description: "desc4",
                 startingTime: nil,
                 isCompleted: false,
-                remindMe: false, priority: Strings.Blue, order: 1
+                remindMe: false, priority: "Blue", order: 1
             ),
             inSection: NewSection(id: "", sectionTitle: ""),
             boardID: ""

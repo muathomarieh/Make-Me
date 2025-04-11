@@ -15,5 +15,10 @@
 	</array>
 	<key>GIDClientID</key>
 	<string>500047354306-p0li1t0ktvi0bt6jbhv2gakcnl5jki7c.apps.googleusercontent.com</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Roboto_Condensed-Bold.ttf</string>
+		<string>Roboto_Condensed-Light.ttf</string>
+	</array>
 </dict>
 </plist>

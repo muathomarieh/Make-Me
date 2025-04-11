@@ -53,6 +53,19 @@ struct MainView: View {
         ZStack {
             
             TabView {
+                Tab("Boards", systemImage: "checklist") {
+                    withAnimation {
+                        BoardsView()
+                            .transition(
+                                AnyTransition.opacity.animation(.easeIn)
+                            )
+                    }
+                }
+                Tab("Friends", systemImage: "person") {
+                    FriendsView(showSignScreen: $showSignScreen)
+                }
+
+                
                 Tab("Pomodoro", systemImage: "clock") {
                     withAnimation {
                         
@@ -63,20 +76,6 @@ struct MainView: View {
                         
                     }
                 }
-
-                Tab("Friends", systemImage: "person") {
-                    FriendsView(showSignScreen: $showSignScreen)
-                }
-
-                Tab("Boards", systemImage: "checklist") {
-                    withAnimation {
-                        BoardsView()
-                            .transition(
-                                AnyTransition.opacity.animation(.easeIn)
-                            )
-                    }
-                }
-                
             }
         }
     }

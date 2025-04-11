@@ -27,8 +27,7 @@ final class FirebaseFirestore {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return decoder
     }()
-    // MARK: DM
-    // Creating
+    // MARK: User
     func addUser(user: NewUserModel) async throws {
         print("AddUser")
         try db
@@ -51,30 +50,35 @@ final class FirebaseFirestore {
         }
     }
     
+    // MARK: Board
+    ////////////////
     func addBoard(board: NewBoard) throws {
         try db
             .collection(Collections.boards.rawValue)
             .document(board.id)
             .setData(from: board, encoder: encoder)
     }
-    
+    func deleteBoard(boardID: String, userID: String) {
+        db.collection(Collections.boards.rawValue).document(boardID).delete()
+    }
+    func leaveBoard(boardID: String, userID: String) {
+        db.collection(Collections.boards.rawValue).document(boardID)
+            .updateData([
+                "board_users": FieldValue.arrayRemove([userID])
+            ])
+    }
+    func updateBoardFavoriteState(boardID: String, state: Bool) {
+        db.collection(Collections.boards.rawValue).document(boardID)
+            .updateData([
+                "is_favorite": !state
+            ])
+    }
+    // MARK: Section
+    //////////////
     func addSection(section: NewSection, boardID: String) throws {
         try sectionCollection(boardID: boardID)
             .document(section.id)
             .setData(from: section, encoder: encoder)
-    }
-    
-    
-    func addTask(task: TaskModel, sectionID: String, boardID: String) throws {
-        print("addTask:::\(task)")
-        try taskCollection(boardID: boardID, sectionID: sectionID)
-            .document(task.id)
-            .setData(from: task, encoder: encoder)
-            
-    }
-    // deleting
-    func deleteBoard(boardID: String, userID: String) {
-        db.collection(Collections.boards.rawValue).document(boardID).delete()
     }
     func deleteSection(sectionID: String, boardID: String) {
         db.collection(Collections.boards.rawValue)
@@ -83,17 +87,18 @@ final class FirebaseFirestore {
             .document(sectionID)
             .delete()
     }
+    // MARK: Task
+    func addTask(task: TaskModel, sectionID: String, boardID: String) throws {
+        print("addTask:::\(task)")
+        try taskCollection(boardID: boardID, sectionID: sectionID)
+            .document(task.id)
+            .setData(from: task, encoder: encoder)
+            
+    }
     func deleteTask(taskID: String, sectionID: String, boardID: String) {
         taskCollection(boardID: boardID, sectionID: sectionID)
             .document(taskID)
             .delete()
-    }
-    // Updating
-    func updateBoardFavoriteState(boardID: String, state: Bool) {
-        db.collection(Collections.boards.rawValue).document(boardID)
-            .updateData([
-                "is_favorite": !state
-            ])
     }
     func updateTaskCompletedState(
         taskID: String,
@@ -107,7 +112,6 @@ final class FirebaseFirestore {
                 "is_completed": !state
             ])
     }
-    
     func updateTask(
         sectionID: String,
         boardID: String,
@@ -120,6 +124,13 @@ final class FirebaseFirestore {
         } catch {
             print("Updateing task failed: \(error)")
         }
+    }
+    func updateTaskOrder(taskID: String, sectionID: String, boardID: String, newOrder: Int) {
+        taskCollection(boardID: boardID, sectionID: sectionID)
+            .document(taskID)
+            .updateData([
+                "order": newOrder
+            ])
     }
     // MARK: Fetching
     func getUserData(userID: String) -> AnyPublisher<NewUserModel, Error> {
@@ -203,7 +214,7 @@ final class FirebaseFirestore {
         return publisher.eraseToAnyPublisher()
     }
     
-    //friends
+    // MARK: Friends
     func friendRequest(email: String, sender: NewUserModel) async -> String {
         do {
             let document = try await db.collection(Collections.users.rawValue)
@@ -288,6 +299,21 @@ final class FirebaseFirestore {
         return publisher.eraseToAnyPublisher()
     }
     
+    func observeBoardUsersIDs(boardID: String) ->  AnyPublisher<NewBoard, Never> {
+        let publisher = PassthroughSubject<NewBoard, Never>()
+        
+        db.collection(Collections.boards.rawValue)
+            .document(boardID)
+            .addSnapshotListener { snapshot, error in
+                
+                guard let board = try? snapshot?.data(as: NewBoard.self, decoder: self.decoder) else {
+                    return
+                }
+                publisher.send(board)
+            }
+        return publisher.eraseToAnyPublisher()
+    }
+    
     //boardsInvites
     func inviteFriendToBoard(reciever: NewUserModel, sender: NewUserModel, boardID: String, boardName: String) async -> String {
         do {
@@ -323,7 +349,6 @@ final class FirebaseFirestore {
         db.collection(Collections.boards.rawValue).document(invite.boardId)
             .updateData([
                 "board_users": FieldValue.arrayUnion([invite.reciever.id]),
-                "board_users_images":  FieldValue.arrayUnion([invite.reciever.image])
             ])
         db.collection(Collections.boardInvites.rawValue).document(invite.id)
             .delete()
@@ -335,14 +360,6 @@ final class FirebaseFirestore {
     }
     
     
-    
-    func updateTaskOrder(taskID: String, sectionID: String, boardID: String, newOrder: Int) {
-        taskCollection(boardID: boardID, sectionID: sectionID)
-            .document(taskID)
-            .updateData([
-                "order": newOrder
-            ])
-    }
     
 }
 

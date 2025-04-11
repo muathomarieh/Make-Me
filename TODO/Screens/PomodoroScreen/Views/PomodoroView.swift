@@ -15,8 +15,6 @@ struct PomodoroView: View {
         ZStack {
             RadialGradient(colors: Color.theme.whiteToAccent, center: .center, startRadius: 10, endRadius: 500)
                 .ignoresSafeArea()
-//            LinearGradient(gradient: Gradient(colors: Colors.backGroundGradiant), startPoint: .bottomTrailing, endPoint: .topLeading)
-//                .ignoresSafeArea()
             VStack {
                 CircleTimer(fraction: timer.fractionPassed, primaryText: timer.secondsLeftString, secondaryText: timer.mode.rawValue)
                     .shadow(radius: 10)

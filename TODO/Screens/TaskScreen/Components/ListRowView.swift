@@ -21,6 +21,7 @@ struct ListRowView: View {
                     checkmarkClicked()
                 }
             Text(item.title)
+                .font(Font.roboto(.bold, size: 20))
                 .foregroundStyle(Color.theme.fontColor)
             
             Spacer()
@@ -33,7 +34,7 @@ struct ListRowView: View {
                         HStack {
                             Text(startingTime.formattedTime)
                                 .font(.caption)
-                                .foregroundStyle(Color.theme.fontColor)
+                                .foregroundStyle(Color.theme.remindColor)
                         }
                     }
             }
@@ -48,7 +49,7 @@ struct ListRowView: View {
 }
 
 #Preview {
-    let item1 = TaskModel(title: "Item4", description: "desc4", startingTime: Date(),isCompleted: false, remindMe: false, priority: Strings.Blue, order: 1)
+    let item1 = TaskModel(title: "Item4", description: "desc4", startingTime: Date(),isCompleted: false, remindMe: false, priority: "red", order: 1)
    
     ZStack {
         Color.blue

@@ -14,9 +14,7 @@ struct FriendsView: View {
     @State var showAddFriend: Bool = false
     @State var text: String = ""
     @EnvironmentObject var appViewModel: AppViewModel
-    
-    //@StateObject var friendsViewModel: FriendsViewModel = FriendsViewModel()
-    
+        
     var body: some View {
         ZStack {
             LinearGradient(

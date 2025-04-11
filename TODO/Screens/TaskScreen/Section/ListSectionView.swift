@@ -15,7 +15,7 @@ struct ListSectionView: View {
     @StateObject var sectionsVM: SectionViewModel
     init(board: NewBoard) {
         self.board = board
-        _sectionsVM = StateObject(wrappedValue: SectionViewModel(boardID: board.id))
+        _sectionsVM = StateObject(wrappedValue: SectionViewModel(boardID: board.id, boardUsersIDs: board.boardUsers))
     }
     @Environment(\.dismiss) var dismiss
 
@@ -52,6 +52,28 @@ struct ListSectionView: View {
                     isEditing.toggle()
                 }
                     
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(sectionsVM.boardUsers) { user in
+                            VStack {
+                                ProfileImageView(image: user.image)
+                                Text(user.name)
+                                    .foregroundStyle(.white)
+                            }
+                            .padding(.init(top: 4, leading: 4, bottom: 0, trailing: 4))
+                            .padding(.top, 4)
+                            .onTapGesture {
+                                do {
+//                                    try appViewModel.inviteFriendToBoard(reciever: friend, board: board)
+//                                    selectedBoardToAddUserTo = nil
+                                } catch {
+                                    print("inviteFriendToBoard Failed: \(error)")
+                                }
+                            }
+                        }
+                    }
+                    .padding(.leading)
+                }
                 if sectionsVM.sections.isEmpty {
                     NoItemsView(inBoard: board)
                         .transition(AnyTransition.opacity.animation(.easeIn))

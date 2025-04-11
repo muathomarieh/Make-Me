@@ -14,7 +14,6 @@ struct CreateNewBoardView: View {
     @EnvironmentObject var appViewModel: AppViewModel
     @State var textFieldText: String = ""
     @State var pickedImage: String = "testImage"
-    @State var pickedImageIndex: Int = 0   // remove when get the images
     
     var body: some View {
         VStack {
@@ -22,8 +21,8 @@ struct CreateNewBoardView: View {
           
             ScrollView(.horizontal) {
                 HStack {
-                    ForEach(0..<25) { index in
-                        Image("testImage")
+                    ForEach(Strings.boardImages, id: \.self) { image in
+                        Image(image)
                             .resizable()
                             .scaledToFit()
                             .frame(height: 120)
@@ -37,10 +36,10 @@ struct CreateNewBoardView: View {
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20)
-                                    .stroke(pickedImageIndex == index ? Color.accentColor : Color.clear, lineWidth: 3)
+                                    .stroke(pickedImage == image ? Color.accentColor : Color.clear, lineWidth: 3)
                             )
                             .onTapGesture {
-                                pickedImageIndex = index
+                                pickedImage = image
                             }
                     }
                 }

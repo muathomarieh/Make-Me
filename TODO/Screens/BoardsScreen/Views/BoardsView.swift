@@ -44,10 +44,7 @@ struct BoardsView: View {
                                 }
                                 ForEach(appViewModel.yourBoards) { board in
                                     BoardCardView(
-                                        boardName: board.boardName,
-                                        imageName: board.boardImage,
-                                        isFavorite: board.isFavorite,
-                                        boardUsersImages: board.boardUsersImages
+                                        board: board                                
                                     ) {
                                         appViewModel.updateBoardFavoriteState(boardID: board.id, state: board.isFavorite)
                                     } plusClicked: {
@@ -70,14 +67,20 @@ struct BoardsView: View {
                                 }
                                 ForEach(appViewModel.haveAccessboards) { board in
                                     BoardAccessedCardView(
-                                        boardName: board.boardName,
-                                        imageName: board.boardImage,
-                                        isFavorite: board.isFavorite, boardUsersImages: board.boardUsersImages
+                                        board: board
                                     ) {
                                         appViewModel.updateBoardFavoriteState(boardID: board.id, state: board.isFavorite)
                                     } 
                                     .onTapGesture {
                                         selectedBoard = board
+                                    }
+                                    .contextMenu {
+                                        Button(role: .destructive) {
+                                            appViewModel.leaveBoard(boardID: board.id)
+                                        } label: {
+                                            Text("Leave Board.")
+                                                .fontWeight(.bold)
+                                        }
                                     }
                                 }
                             }

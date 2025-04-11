@@ -18,6 +18,7 @@ struct Theme {
     let whiteToAccent = [.white, Color.accentColor]
     let appGray = Color("AppGray")
     let fontColor = Color("FontColor")
+    let remindColor = Color("remindColor")
 }
 
 struct Priority {

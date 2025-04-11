@@ -382,6 +382,7 @@ import Combine
 
 class AppViewModel: ObservableObject {
     
+    static var shared = AppViewModel()
     @Published var user: NewUserModel? = nil
     
     @Published var friendRequests: [FriendRequest] = []
@@ -485,6 +486,15 @@ class AppViewModel: ObservableObject {
         }
     }
     
+    func leaveBoard(boardID: String) {
+        do {
+            let user = try AuthenticationManager.shared.getAuthenticatedUser()
+            FirebaseFirestore.shared.leaveBoard(boardID: boardID, userID: user.uid)
+        } catch {
+            print(print("Failed to get the user id in deleteBoard."))
+        }
+    }
+    
     func updateBoardFavoriteState(boardID: String, state: Bool) {
         FirebaseFirestore.shared.updateBoardFavoriteState(boardID: boardID, state: state)
     }
@@ -553,11 +563,7 @@ class AppViewModel: ObservableObject {
     
     func addBoard(boardName: String, boardImage: String) throws {
         let userAuthenticated = try AuthenticationManager.shared.getAuthenticatedUser()
-        let newBoard = if let image = user?.image {
-             NewBoard(boardName: boardName, boardImage: "testImage", creatorId: userAuthenticated.uid, boardUsers: [userAuthenticated.uid], boardUsersImages: [image])
-        } else {
-             NewBoard(boardName: boardName, boardImage: "testImage", creatorId: userAuthenticated.uid, boardUsers: [userAuthenticated.uid])
-        }
+        let newBoard = NewBoard(boardName: boardName, boardImage: "testImage", creatorId: userAuthenticated.uid, boardUsers: [userAuthenticated.uid])
         try FirebaseFirestore.shared.addBoard(board: newBoard)
     }
     
